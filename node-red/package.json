@@ -1,0 +1,15 @@
+{
+    "name": "node-red-project",
+    "description": "A Node-RED Project",
+    "version": "0.0.1",
+    "private": true,
+    "scripts": {
+        "start": "node $NODE_OPTIONS node_modules/node-red/red.js $FLOWS",
+        "dev": "node-red -u ./"
+    },
+    "dependencies": {
+        "node-red": "3.0.2",
+        "@stevokk/node-red-contrib-socketio": "~1.1.1",
+        "node-red-contrib-modbus": "~5.26.0"
+    }
+}
