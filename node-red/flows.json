@@ -53,6 +53,12 @@
         "charset": "UTF8"
     },
     {
+        "id": "f8eb90804d4934dd",
+        "type": "websocket-listener",
+        "path": "/ws/test",
+        "wholemsg": "false"
+    },
+    {
         "id": "7781c73.639b8b8",
         "type": "debug",
         "z": "d8f388f98592d062",
@@ -107,8 +113,8 @@
         "z": "d8f388f98592d062",
         "mydb": "608ff9c050d10945",
         "name": "",
-        "x": 1040,
-        "y": 420,
+        "x": 1000,
+        "y": 480,
         "wires": [
             []
         ]
@@ -150,6 +156,73 @@
             [
                 "7781c73.639b8b8",
                 "b376694bf4e68cde"
+            ]
+        ]
+    },
+    {
+        "id": "a7b6b0c7b6d949ad",
+        "type": "websocket in",
+        "z": "d8f388f98592d062",
+        "name": "",
+        "server": "f8eb90804d4934dd",
+        "client": "",
+        "x": 450,
+        "y": 500,
+        "wires": [
+            [
+                "482ea5aabb782341"
+            ]
+        ]
+    },
+    {
+        "id": "482ea5aabb782341",
+        "type": "debug",
+        "z": "d8f388f98592d062",
+        "name": "debug 2",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 720,
+        "y": 540,
+        "wires": []
+    },
+    {
+        "id": "a72bca4b2ccb6e50",
+        "type": "websocket out",
+        "z": "d8f388f98592d062",
+        "name": "",
+        "server": "f8eb90804d4934dd",
+        "client": "",
+        "x": 650,
+        "y": 440,
+        "wires": []
+    },
+    {
+        "id": "367ba98cfe4a9e85",
+        "type": "inject",
+        "z": "d8f388f98592d062",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "[{\"id\":\"d8f388f98592d062\",\"type\":\"tab\",\"label\":\"Поток 1\",\"disabled\":false,\"info\":\"\",\"env\":[]},{\"id\":\"dc35f1f13fade75e\",\"type\":\"tab\",\"label\":\"Поток 0\",\"disabled\":true,\"info\":\"\",\"env\":[]},{\"id\":\"b8dd5dc2.87841\",\"type\":\"modbus-client\",\"name\":\"et-7017\",\"clienttype\":\"tcp\",\"bufferCommands\":true,\"stateLogEnabled\":false,\"queueLogEnabled\":false,\"failureLogEnabled\":false,\"tcpHost\":\"10.5.66.77\",\"tcpPort\":\"502\",\"tcpType\":\"DEFAULT\",\"serialPort\":\"/dev/ttyUSB\",\"serialType\":\"RTU-BUFFERD\",\"serialBaudrate\":\"9600\",\"serialDatabits\":\"8\",\"serialStopbits\":\"1\",\"serialParity\":\"none\",\"serialConnectionDelay\":\"100\",\"serialAsciiResponseStartDelimiter\":\"\",\"unit_id\":1,\"commandDelay\":1,\"clientTimeout\":1000,\"reconnectOnTimeout\":true,\"reconnectTimeout\":2000,\"parallelUnitIdsAllowed\":true},{\"id\":\"608ff9c050d10945\",\"type\":\"MySQLdatabase\",\"name\":\"mysql-db\",\"host\":\"127.0.0.1\",\"port\":\"3306\",\"db\":\"TestBase\",\"tz\":\"\",\"charset\":\"UTF8\"},{\"id\":\"f8eb90804d4934dd\",\"type\":\"websocket-listener\",\"path\":\"/ws/test\",\"wholemsg\":\"false\"},{\"id\":\"7781c73.639b8b8\",\"type\":\"debug\",\"z\":\"d8f388f98592d062\",\"name\":\"\",\"active\":false,\"tosidebar\":true,\"console\":false,\"tostatus\":true,\"complete\":\"payload\",\"targetType\":\"msg\",\"statusVal\":\"payload\",\"statusType\":\"auto\",\"x\":870,\"y\":300,\"wires\":[]},{\"id\":\"2baa9bc7.3878b4\",\"type\":\"modbus-read\",\"z\":\"d8f388f98592d062\",\"name\":\"Температура\",\"topic\":\"temp\",\"showStatusActivities\":false,\"logIOActivities\":false,\"showErrors\":false,\"showWarnings\":true,\"unitid\":\"1\",\"dataType\":\"InputRegister\",\"adr\":\"1\",\"quantity\":\"1\",\"rate\":\"10\",\"rateUnit\":\"s\",\"delayOnStart\":false,\"startDelayTime\":\"\",\"server\":\"b8dd5dc2.87841\",\"useIOFile\":false,\"ioFile\":\"\",\"useIOForPayload\":false,\"emptyMsgOnFail\":false,\"x\":210,\"y\":360,\"wires\":[[\"5ecc1bd2af1ac89d\",\"a72bca4b2ccb6e50\"],[]]},{\"id\":\"b376694bf4e68cde\",\"type\":\"mysql\",\"z\":\"d8f388f98592d062\",\"mydb\":\"608ff9c050d10945\",\"name\":\"\",\"x\":1000,\"y\":480,\"wires\":[[]]},{\"id\":\"5ecc1bd2af1ac89d\",\"type\":\"range\",\"z\":\"d8f388f98592d062\",\"minin\":\"4000\",\"maxin\":\"20000\",\"minout\":\"-19.4\",\"maxout\":\"60.5\",\"action\":\"scale\",\"round\":false,\"property\":\"payload\",\"name\":\"\",\"x\":430,\"y\":340,\"wires\":[[\"c93207d7c1215c19\"]]},{\"id\":\"c93207d7c1215c19\",\"type\":\"function\",\"z\":\"d8f388f98592d062\",\"name\":\"\",\"func\":\"let [date, time] = new Date().toLocaleString('ru-RU').split(', ')\\ndate = date.split('.').reverse().join('-')\\n\\nmsg.payload = [`${date} ${time}`, +msg.payload.toFixed(1)]\\nmsg.topic = \\\"INSERT INTO test VALUES (?, ?);\\\"\\n\\nreturn msg;\",\"outputs\":1,\"noerr\":0,\"initialize\":\"\",\"finalize\":\"\",\"libs\":[],\"x\":620,\"y\":340,\"wires\":[[\"7781c73.639b8b8\",\"b376694bf4e68cde\"]]},{\"id\":\"a7b6b0c7b6d949ad\",\"type\":\"websocket in\",\"z\":\"d8f388f98592d062\",\"name\":\"\",\"server\":\"f8eb90804d4934dd\",\"client\":\"\",\"x\":450,\"y\":500,\"wires\":[[\"482ea5aabb782341\"]]},{\"id\":\"482ea5aabb782341\",\"type\":\"debug\",\"z\":\"d8f388f98592d062\",\"name\":\"debug 2\",\"active\":true,\"tosidebar\":true,\"console\":false,\"tostatus\":false,\"complete\":\"false\",\"statusVal\":\"\",\"statusType\":\"auto\",\"x\":720,\"y\":540,\"wires\":[]},{\"id\":\"a72bca4b2ccb6e50\",\"type\":\"websocket out\",\"z\":\"d8f388f98592d062\",\"name\":\"\",\"server\":\"f8eb90804d4934dd\",\"client\":\"\",\"x\":650,\"y\":440,\"wires\":[]},{\"id\":\"39dd64a2.77696c\",\"type\":\"inject\",\"z\":\"dc35f1f13fade75e\",\"name\":\"Starten\",\"props\":[{\"p\":\"payload\"}],\"repeat\":\"\",\"crontab\":\"\",\"once\":true,\"onceDelay\":\"\",\"topic\":\"\",\"payload\":\"\",\"payloadType\":\"date\",\"x\":200,\"y\":240,\"wires\":[[\"af7d7058.5db5c\"]]},{\"id\":\"af7d7058.5db5c\",\"type\":\"http request\",\"z\":\"dc35f1f13fade75e\",\"name\":\"Load flow\",\"method\":\"GET\",\"ret\":\"obj\",\"paytoqs\":\"ignore\",\"url\":\"http://127.0.0.1:1880/flow/global\",\"tls\":\"\",\"persist\":false,\"proxy\":\"\",\"insecureHTTPParser\":false,\"authType\":\"\",\"senderr\":false,\"headers\":[],\"x\":480,\"y\":240,\"wires\":[[\"116be983.0bdd06\",\"0e85931f841c50a9\"]]},{\"id\":\"116be983.0bdd06\",\"type\":\"function\",\"z\":\"dc35f1f13fade75e\",\"name\":\"Modify tcpout settings\",\"func\":\"// increment the connection port\\n// of the tcp out node with id 20ce9864.df2028\\n// increment is done on every input of inject\\n// the flowid is set in the topic of the inject \\n// node\\n\\nconst configCopy = JSON.parse(JSON.stringify(msg.payload.configs));\\n\\nconst modbusClientId = 'b8dd5dc2.87841';\\nconst dataBaseId = '608ff9c050d10945';\\n\\nconfigCopy.forEach(function(el) {\\n    if (el.id === modbusClientId) {\\n        el.tcpHost = env.get(\\\"MODBUS_TCP_IP\\\")\\n    }\\n    if (el.id === dataBaseId) {\\n        el.host = env.get(\\\"MYSQL_IP\\\")\\n    }\\n});\\n\\nif (JSON.stringify(msg.payload.configs) === JSON.stringify(configCopy)) return\\n\\nmsg.payload.configs = configCopy\\nmsg.headers = {\\n    'Content-Type': 'application/json',\\n    'Accept' : 'application/json'};\\nmsg.url = \\\"http://127.0.0.1:1880/flow/global\\\"\\nmsg.method =\\\"PUT\\\";\\n\\nreturn msg;\",\"outputs\":1,\"noerr\":0,\"initialize\":\"\",\"finalize\":\"\",\"libs\":[],\"x\":720,\"y\":240,\"wires\":[[\"c888e5aa.be7428\",\"0e85931f841c50a9\"]]},{\"id\":\"c888e5aa.be7428\",\"type\":\"http request\",\"z\":\"dc35f1f13fade75e\",\"name\":\"Save flow\",\"method\":\"use\",\"ret\":\"obj\",\"paytoqs\":\"ignore\",\"url\":\"\",\"tls\":\"\",\"persist\":false,\"proxy\":\"\",\"insecureHTTPParser\":false,\"authType\":\"\",\"senderr\":false,\"headers\":[],\"x\":1000,\"y\":240,\"wires\":[[]]},{\"id\":\"0e85931f841c50a9\",\"type\":\"debug\",\"z\":\"dc35f1f13fade75e\",\"name\":\"debug 1\",\"active\":false,\"tosidebar\":true,\"console\":false,\"tostatus\":false,\"complete\":\"true\",\"targetType\":\"full\",\"statusVal\":\"\",\"statusType\":\"auto\",\"x\":1080,\"y\":360,\"wires\":[]}]",
+        "payloadType": "json",
+        "x": 220,
+        "y": 440,
+        "wires": [
+            [
+                "a72bca4b2ccb6e50"
             ]
         ]
     },
