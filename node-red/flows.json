@@ -10,7 +10,7 @@
     {
         "id": "dc35f1f13fade75e",
         "type": "tab",
-        "label": "Поток 2",
+        "label": "Поток 0",
         "disabled": false,
         "info": "",
         "env": []
@@ -47,7 +47,7 @@
         "type": "debug",
         "z": "d8f388f98592d062",
         "name": "",
-        "active": false,
+        "active": true,
         "tosidebar": true,
         "console": false,
         "tostatus": true,
@@ -83,7 +83,7 @@
         "useIOForPayload": false,
         "emptyMsgOnFail": false,
         "x": 230,
-        "y": 360,
+        "y": 320,
         "wires": [
             [],
             [
@@ -112,7 +112,7 @@
         "topic": "",
         "payload": "",
         "payloadType": "date",
-        "x": 160,
+        "x": 200,
         "y": 440,
         "wires": [
             [
@@ -131,13 +131,60 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 480,
+        "x": 440,
         "y": 440,
         "wires": [
             [
                 "7781c73.639b8b8"
             ]
         ]
+    },
+    {
+        "id": "9e430d13a442a40f",
+        "type": "inject",
+        "z": "d8f388f98592d062",
+        "name": "",
+        "props": [
+            {
+                "p": "mysql",
+                "v": "MYSQL_IP",
+                "vt": "env"
+            },
+            {
+                "p": "modbus",
+                "v": "MODBUS_TCP_IP",
+                "vt": "env"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 180,
+        "y": 560,
+        "wires": [
+            [
+                "9e4315ae5d4cacb0"
+            ]
+        ]
+    },
+    {
+        "id": "9e4315ae5d4cacb0",
+        "type": "debug",
+        "z": "d8f388f98592d062",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 630,
+        "y": 560,
+        "wires": []
     },
     {
         "id": "39dd64a2.77696c",

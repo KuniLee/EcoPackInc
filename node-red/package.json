@@ -8,8 +8,8 @@
         "dev": "node-red -u ./"
     },
     "dependencies": {
-        "node-red": "3.0.2",
         "@stevokk/node-red-contrib-socketio": "~1.1.1",
+        "node-red": "3.0.2",
         "node-red-contrib-modbus": "~5.26.0"
     }
 }
