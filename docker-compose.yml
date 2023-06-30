@@ -27,8 +27,9 @@ services:
       - "1880:1880"
     tty: true
     environment:
+      TZ: Asia/Yekaterinburg
       MODBUS_TCP_IP: ${MODBUS_TCP_IP}
-      MYSQL_IP: ${MYSQL_IP}
+      MYSQL_IP: ${MYSQL_IP_ENV}
 
   mysql:
     image: mysql:8

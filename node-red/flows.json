@@ -35,19 +35,29 @@
         "serialParity": "none",
         "serialConnectionDelay": "100",
         "serialAsciiResponseStartDelimiter": "",
-        "unit_id": "1",
-        "commandDelay": "1",
-        "clientTimeout": "1000",
+        "unit_id": 1,
+        "commandDelay": 1,
+        "clientTimeout": 1000,
         "reconnectOnTimeout": true,
-        "reconnectTimeout": "2000",
+        "reconnectTimeout": 2000,
         "parallelUnitIdsAllowed": true
+    },
+    {
+        "id": "608ff9c050d10945",
+        "type": "MySQLdatabase",
+        "name": "mysql-db",
+        "host": "127.0.0.1",
+        "port": "3306",
+        "db": "TestBase",
+        "tz": "",
+        "charset": "UTF8"
     },
     {
         "id": "7781c73.639b8b8",
         "type": "debug",
         "z": "d8f388f98592d062",
         "name": "",
-        "active": true,
+        "active": false,
         "tosidebar": true,
         "console": false,
         "tostatus": true,
@@ -55,8 +65,8 @@
         "targetType": "msg",
         "statusVal": "payload",
         "statusType": "auto",
-        "x": 730,
-        "y": 400,
+        "x": 870,
+        "y": 300,
         "wires": []
     },
     {
@@ -73,7 +83,7 @@
         "dataType": "InputRegister",
         "adr": "1",
         "quantity": "1",
-        "rate": "5",
+        "rate": "10",
         "rateUnit": "s",
         "delayOnStart": false,
         "startDelayTime": "",
@@ -82,109 +92,66 @@
         "ioFile": "",
         "useIOForPayload": false,
         "emptyMsgOnFail": false,
-        "x": 230,
-        "y": 320,
+        "x": 210,
+        "y": 360,
         "wires": [
-            [],
             [
-                "7781c73.639b8b8"
-            ]
+                "5ecc1bd2af1ac89d"
+            ],
+            []
         ]
     },
     {
-        "id": "176487f6ceb5f730",
-        "type": "inject",
+        "id": "b376694bf4e68cde",
+        "type": "mysql",
         "z": "d8f388f98592d062",
+        "mydb": "608ff9c050d10945",
         "name": "",
-        "props": [
-            {
-                "p": "payload"
-            },
-            {
-                "p": "topic",
-                "vt": "str"
-            }
-        ],
-        "repeat": "",
-        "crontab": "",
-        "once": false,
-        "onceDelay": 0.1,
-        "topic": "",
-        "payload": "",
-        "payloadType": "date",
-        "x": 200,
-        "y": 440,
+        "x": 1040,
+        "y": 420,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "5ecc1bd2af1ac89d",
+        "type": "range",
+        "z": "d8f388f98592d062",
+        "minin": "4000",
+        "maxin": "20000",
+        "minout": "-19.4",
+        "maxout": "60.5",
+        "action": "scale",
+        "round": false,
+        "property": "payload",
+        "name": "",
+        "x": 430,
+        "y": 340,
         "wires": [
             [
-                "b13820bd1749a8b1"
+                "c93207d7c1215c19"
             ]
         ]
     },
     {
-        "id": "b13820bd1749a8b1",
+        "id": "c93207d7c1215c19",
         "type": "function",
         "z": "d8f388f98592d062",
-        "name": "function 1",
-        "func": "let node1 = RED.nodes.node('b8dd5dc2.87841');\nmsg.payload = node1\nreturn msg;",
+        "name": "",
+        "func": "let [date, time] = new Date().toLocaleString('ru-RU').split(', ')\ndate = date.split('.').reverse().join('-')\n\nmsg.payload = [`${date} ${time}`, +msg.payload.toFixed(1)]\nmsg.topic = \"INSERT INTO test VALUES (?, ?);\"\n\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 440,
-        "y": 440,
+        "x": 620,
+        "y": 340,
         "wires": [
             [
-                "7781c73.639b8b8"
+                "7781c73.639b8b8",
+                "b376694bf4e68cde"
             ]
         ]
-    },
-    {
-        "id": "9e430d13a442a40f",
-        "type": "inject",
-        "z": "d8f388f98592d062",
-        "name": "",
-        "props": [
-            {
-                "p": "mysql",
-                "v": "MYSQL_IP",
-                "vt": "env"
-            },
-            {
-                "p": "modbus",
-                "v": "MODBUS_TCP_IP",
-                "vt": "env"
-            }
-        ],
-        "repeat": "",
-        "crontab": "",
-        "once": false,
-        "onceDelay": 0.1,
-        "topic": "",
-        "x": 180,
-        "y": 560,
-        "wires": [
-            [
-                "9e4315ae5d4cacb0"
-            ]
-        ]
-    },
-    {
-        "id": "9e4315ae5d4cacb0",
-        "type": "debug",
-        "z": "d8f388f98592d062",
-        "name": "",
-        "active": true,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "true",
-        "targetType": "full",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 630,
-        "y": 560,
-        "wires": []
     },
     {
         "id": "39dd64a2.77696c",
@@ -241,7 +208,7 @@
         "type": "function",
         "z": "dc35f1f13fade75e",
         "name": "Modify tcpout settings",
-        "func": "// increment the connection port\n// of the tcp out node with id 20ce9864.df2028\n// increment is done on every input of inject\n// the flowid is set in the topic of the inject \n// node\n\nvar fn = msg.payload.configs;\nvar sn = 'b8dd5dc2.87841';\nconst newIp = env.get(\"MODBUS_TCP_IP\");\nmsg.headers = {\n    'Content-Type': 'application/json',\n    'Accept' : 'application/json'};\nmsg.url = \"http://127.0.0.1:1880/flow/global\"\nmsg.method =\"PUT\";\nfor(var i=0;i<fn.length;i++) {\n    if (fn[i].id == sn) {\n        if (fn[i].tcpHost === newIp || !newIp) return\n        fn[i].tcpHost = newIp;\n        return msg;\n    }\n        \n}\n\n\nreturn msg;",
+        "func": "// increment the connection port\n// of the tcp out node with id 20ce9864.df2028\n// increment is done on every input of inject\n// the flowid is set in the topic of the inject \n// node\n\nconst configCopy = JSON.parse(JSON.stringify(msg.payload.configs));\n\nconst modbusClientId = 'b8dd5dc2.87841';\nconst dataBaseId = '608ff9c050d10945';\n\nconfigCopy.forEach(function(el) {\n    if (el.id === modbusClientId) {\n        el.tcpHost = env.get(\"MODBUS_TCP_IP\")\n    }\n    if (el.id === dataBaseId) {\n        el.host = env.get(\"MYSQL_IP\")\n    }\n});\n\nif (JSON.stringify(msg.payload.configs) === JSON.stringify(configCopy)) return\n\nmsg.payload.configs = configCopy\nmsg.headers = {\n    'Content-Type': 'application/json',\n    'Accept' : 'application/json'};\nmsg.url = \"http://127.0.0.1:1880/flow/global\"\nmsg.method =\"PUT\";\n\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
@@ -251,7 +218,8 @@
         "y": 240,
         "wires": [
             [
-                "c888e5aa.be7428"
+                "c888e5aa.be7428",
+                "0e85931f841c50a9"
             ]
         ]
     },
@@ -274,9 +242,7 @@
         "x": 1000,
         "y": 240,
         "wires": [
-            [
-                "0e85931f841c50a9"
-            ]
+            []
         ]
     },
     {
@@ -284,7 +250,7 @@
         "type": "debug",
         "z": "dc35f1f13fade75e",
         "name": "debug 1",
-        "active": true,
+        "active": false,
         "tosidebar": true,
         "console": false,
         "tostatus": false,
