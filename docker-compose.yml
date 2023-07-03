@@ -16,6 +16,7 @@ services:
 
   nginx:
     image: kunilee/nginx-test:latest
+    restart: always
     container_name: nginx
     ports:
       - "80:80"
@@ -23,6 +24,7 @@ services:
   node-red:
     image: kunilee/node-red:latest
     container_name: node-red
+    restart: always
     ports:
       - "1880:1880"
     tty: true
@@ -54,6 +56,3 @@ services:
     environment:
       ADMINER_DESIGN: pappu687
       ADMINER_DEFAULT_SERVER: mysql
-
-#    volumes:
-#      - data:/data
