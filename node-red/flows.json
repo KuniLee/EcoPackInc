@@ -35,11 +35,11 @@
         "serialParity": "none",
         "serialConnectionDelay": "100",
         "serialAsciiResponseStartDelimiter": "",
-        "unit_id": 1,
-        "commandDelay": 1,
-        "clientTimeout": 1000,
+        "unit_id": "1",
+        "commandDelay": "1",
+        "clientTimeout": "1000",
         "reconnectOnTimeout": true,
-        "reconnectTimeout": 2000,
+        "reconnectTimeout": "2000",
         "parallelUnitIdsAllowed": true
     },
     {
@@ -137,7 +137,8 @@
         "y": 340,
         "wires": [
             [
-                "c31b619b9f6d95a4"
+                "c31b619b9f6d95a4",
+                "6a3079b24b200196"
             ],
             [
                 "a72bca4b2ccb6e50"
@@ -179,6 +180,23 @@
                 "b376694bf4e68cde"
             ]
         ]
+    },
+    {
+        "id": "6a3079b24b200196",
+        "type": "debug",
+        "z": "d8f388f98592d062",
+        "name": "debug 2",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 740,
+        "y": 500,
+        "wires": []
     },
     {
         "id": "39dd64a2.77696c",
