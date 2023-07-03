@@ -15,7 +15,7 @@ services:
     image: containrrr/watchtower
 
   nginx:
-    image: kunilee/nginx-test:latest
+    image: kunilee/nginx:latest
     restart: always
     container_name: nginx
     ports:
