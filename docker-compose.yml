@@ -49,6 +49,8 @@ services:
 
   adminer:
     image: adminer
+    depends_on:
+      - mysql
     container_name: adminer
     restart: always
     ports:
