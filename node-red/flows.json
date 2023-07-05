@@ -3,7 +3,7 @@
         "id": "d8f388f98592d062",
         "type": "tab",
         "label": "Поток 1",
-        "disabled": false,
+        "disabled": true,
         "info": "",
         "env": []
     },
@@ -16,15 +16,23 @@
         "env": []
     },
     {
+        "id": "6e52c1301b78909b",
+        "type": "tab",
+        "label": "Поток 2",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
         "id": "b8dd5dc2.87841",
         "type": "modbus-client",
-        "name": "et-7017",
+        "name": "modbusTCPserver",
         "clienttype": "tcp",
         "bufferCommands": true,
         "stateLogEnabled": false,
         "queueLogEnabled": false,
         "failureLogEnabled": false,
-        "tcpHost": "10.5.66.77",
+        "tcpHost": "localhost",
         "tcpPort": "502",
         "tcpType": "DEFAULT",
         "serialPort": "/dev/ttyUSB",
@@ -35,7 +43,7 @@
         "serialParity": "none",
         "serialConnectionDelay": "100",
         "serialAsciiResponseStartDelimiter": "",
-        "unit_id": "1",
+        "unit_id": "",
         "commandDelay": "1",
         "clientTimeout": "1000",
         "reconnectOnTimeout": true,
@@ -253,7 +261,7 @@
         "type": "function",
         "z": "dc35f1f13fade75e",
         "name": "Modify tcpout settings",
-        "func": "// increment the connection port\n// of the tcp out node with id 20ce9864.df2028\n// increment is done on every input of inject\n// the flowid is set in the topic of the inject \n// node\n\nconst configCopy = JSON.parse(JSON.stringify(msg.payload.configs));\n\nconst modbusClientId = 'b8dd5dc2.87841';\nconst dataBaseId = '608ff9c050d10945';\n\nconfigCopy.forEach(function(el) {\n    if (el.id === modbusClientId) {\n        el.tcpHost = env.get(\"MODBUS_TCP_IP\")\n    }\n    if (el.id === dataBaseId) {\n        el.host = env.get(\"MYSQL_IP\")\n    }\n});\n\nif (JSON.stringify(msg.payload.configs) === JSON.stringify(configCopy)) return\n\nmsg.payload.configs = configCopy\nmsg.headers = {\n    'Content-Type': 'application/json',\n    'Accept' : 'application/json'};\nmsg.url = \"http://127.0.0.1:1880/flow/global\"\nmsg.method =\"PUT\";\n\nreturn msg;",
+        "func": "// increment the connection port\n// of the tcp out node with id 20ce9864.df2028\n// increment is done on every input of inject\n// the flowid is set in the topic of the inject \n// node\n\nconst configCopy = JSON.parse(JSON.stringify(msg.payload.configs));\n\nconst modbusClientId = 'b8dd5dc2.87841';\nconst dataBaseId = '608ff9c050d10945';\n\nconfigCopy.forEach(function(el) {\n    // if (el.id === modbusClientId) {\n    //     el.tcpHost = env.get(\"MODBUS_TCP_IP\")\n    // }\n    if (el.id === dataBaseId) {\n        el.host = env.get(\"MYSQL_IP\")\n    }\n});\n\nif (JSON.stringify(msg.payload.configs) === JSON.stringify(configCopy)) return\n\nmsg.payload.configs = configCopy\nmsg.headers = {\n    'Content-Type': 'application/json',\n    'Accept' : 'application/json'};\nmsg.url = \"http://127.0.0.1:1880/flow/global\"\nmsg.method =\"PUT\";\n\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
@@ -306,5 +314,184 @@
         "x": 1080,
         "y": 360,
         "wires": []
+    },
+    {
+        "id": "633362dc377d8255",
+        "type": "debug",
+        "z": "6e52c1301b78909b",
+        "name": "debug 3",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 940,
+        "y": 580,
+        "wires": []
+    },
+    {
+        "id": "5c7d0c636d0abba8",
+        "type": "function",
+        "z": "6e52c1301b78909b",
+        "name": "Поменять местами байты",
+        "func": "const buf = msg.payload.buffer.reverse()\n\nfor (let i = 0; i < buf.length; i=i+2) {\n    [buf[i], buf[i + 1]] = [buf[i+1], buf[i]];\n}\n\nmsg.payload = buf.readInt32BE(0)\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 780,
+        "y": 460,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "301faa842db8fef8",
+        "type": "modbus-flex-sequencer",
+        "z": "6e52c1301b78909b",
+        "name": "",
+        "sequences": [
+            {
+                "name": "Counter",
+                "unitid": "1",
+                "fc": "FC4",
+                "address": "1001",
+                "quantity": "2"
+            }
+        ],
+        "server": "b8dd5dc2.87841",
+        "showStatusActivities": false,
+        "showErrors": false,
+        "showWarnings": true,
+        "logIOActivities": false,
+        "useIOFile": false,
+        "ioFile": "",
+        "useIOForPayload": false,
+        "emptyMsgOnFail": false,
+        "keepMsgProperties": false,
+        "delayOnStart": false,
+        "startDelayTime": "",
+        "x": 560,
+        "y": 200,
+        "wires": [
+            [
+                "633362dc377d8255"
+            ],
+            [
+                "5c7d0c636d0abba8"
+            ]
+        ]
+    },
+    {
+        "id": "c7f2674f6378e416",
+        "type": "inject",
+        "z": "6e52c1301b78909b",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 140,
+        "y": 200,
+        "wires": [
+            [
+                "fb09af9ead3704ba"
+            ]
+        ]
+    },
+    {
+        "id": "fb09af9ead3704ba",
+        "type": "function",
+        "z": "6e52c1301b78909b",
+        "name": "function 1",
+        "func": "msg.sequences = [\n    { \n    name: \"First\",\n    fc: 4,\n    address: 1001,\n    unitid: 1,\n    quantity: 2, \n    },\n    { \n    name: \"Bar\",\n    fc: 4,\n    address: 1001,\n    unitid: 2,\n    quantity: 2\n    }]\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 340,
+        "y": 200,
+        "wires": [
+            [
+                "301faa842db8fef8"
+            ]
+        ]
+    },
+    {
+        "id": "accc94a8e437d04e",
+        "type": "modbus-flex-connector",
+        "z": "6e52c1301b78909b",
+        "name": "",
+        "maxReconnectsPerMinute": 4,
+        "emptyQueue": false,
+        "showStatusActivities": false,
+        "showErrors": false,
+        "server": "b8dd5dc2.87841",
+        "x": 490,
+        "y": 60,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "cd9b0f3aa0616ee9",
+        "type": "inject",
+        "z": "6e52c1301b78909b",
+        "name": "Starten",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": "1",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 120,
+        "y": 60,
+        "wires": [
+            [
+                "2fb2560dc6144677"
+            ]
+        ]
+    },
+    {
+        "id": "2fb2560dc6144677",
+        "type": "function",
+        "z": "6e52c1301b78909b",
+        "name": "function 2",
+        "func": "msg.payload = {\n    connectorType: \"TCP\",\n   //tcpHost: env.get(\"MODBUS_TCP_IP\"),\n    tcpHost: '10.5.66.101',\n}\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 280,
+        "y": 60,
+        "wires": [
+            [
+                "accc94a8e437d04e"
+            ]
+        ]
     }
 ]
