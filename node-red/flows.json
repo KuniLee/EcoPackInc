@@ -120,8 +120,8 @@
         "z": "d8f388f98592d062",
         "mydb": "608ff9c050d10945",
         "name": "",
-        "x": 400,
-        "y": 220,
+        "x": 620,
+        "y": 260,
         "wires": [
             [
                 "0ebd02be01c41393"
@@ -136,24 +136,20 @@
         "props": [
             {
                 "p": "payload"
-            },
-            {
-                "p": "topic",
-                "vt": "str"
             }
         ],
         "repeat": "",
         "crontab": "",
         "once": true,
         "onceDelay": "0.5",
-        "topic": "SELECT * FROM ModbusCounters",
+        "topic": "",
         "payload": "",
         "payloadType": "date",
-        "x": 220,
-        "y": 220,
+        "x": 160,
+        "y": 260,
         "wires": [
             [
-                "f1a39dbdacbb6d43"
+                "d43fee0fedd81d84"
             ]
         ]
     },
@@ -168,8 +164,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 610,
-        "y": 220,
+        "x": 850,
+        "y": 260,
         "wires": [
             []
         ]
@@ -183,6 +179,50 @@
         "x": 260,
         "y": 180,
         "wires": []
+    },
+    {
+        "id": "231fb27999873a06",
+        "type": "link in",
+        "z": "d8f388f98592d062",
+        "name": "init devices",
+        "links": [
+            "3b36fa04cce40f0c",
+            "87b2af39a5351a4d"
+        ],
+        "x": 155,
+        "y": 340,
+        "wires": [
+            [
+                "d43fee0fedd81d84"
+            ]
+        ]
+    },
+    {
+        "id": "d43fee0fedd81d84",
+        "type": "change",
+        "z": "d8f388f98592d062",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "topic",
+                "pt": "msg",
+                "to": "SELECT * FROM ModbusCounters",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 420,
+        "y": 260,
+        "wires": [
+            [
+                "f1a39dbdacbb6d43"
+            ]
+        ]
     },
     {
         "id": "5c7d0c636d0abba8",
@@ -460,8 +500,8 @@
         "name": "",
         "server": "f8eb90804d4934dd",
         "client": "",
-        "x": 510,
-        "y": 260,
+        "x": 470,
+        "y": 60,
         "wires": []
     },
     {
@@ -472,17 +512,624 @@
         "links": [
             "fd9e7bdf516c2476"
         ],
-        "x": 205,
-        "y": 260,
+        "x": 225,
+        "y": 60,
         "wires": [
             [
-                "84cf37ea77d8825f",
-                "d57e6458077688b2"
+                "84cf37ea77d8825f"
             ]
         ]
     },
     {
-        "id": "d57e6458077688b2",
+        "id": "59ff2a1.fa600d4",
+        "type": "http in",
+        "z": "f8267d55bb8665c3",
+        "name": "",
+        "url": "/api/:name",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 100,
+        "y": 180,
+        "wires": [
+            [
+                "78ec0b97e374799a"
+            ]
+        ]
+    },
+    {
+        "id": "266c286f.d993d8",
+        "type": "http response",
+        "z": "f8267d55bb8665c3",
+        "name": "",
+        "statusCode": "200",
+        "headers": {},
+        "x": 1200,
+        "y": 180,
+        "wires": []
+    },
+    {
+        "id": "bcf0258362e4a423",
+        "type": "mysql",
+        "z": "f8267d55bb8665c3",
+        "mydb": "608ff9c050d10945",
+        "name": "",
+        "x": 720,
+        "y": 180,
+        "wires": [
+            [
+                "6b4dcc60885175ea"
+            ]
+        ]
+    },
+    {
+        "id": "6b4dcc60885175ea",
+        "type": "function",
+        "z": "f8267d55bb8665c3",
+        "name": "Преобразование ответа",
+        "func": "for (const device of msg.payload) {\n    device.IsRequested = !!device.IsRequested.readInt8(0)\n}\nglobal.set('devices', msg.payload)\n\n\nmsg.headers = {\n    'content-type': 'application/json'\n}\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 950,
+        "y": 180,
+        "wires": [
+            [
+                "266c286f.d993d8"
+            ]
+        ]
+    },
+    {
+        "id": "78ec0b97e374799a",
+        "type": "switch",
+        "z": "f8267d55bb8665c3",
+        "name": "",
+        "property": "req.params.name",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "devices",
+                "vt": "str"
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 310,
+        "y": 180,
+        "wires": [
+            [
+                "727937e9065df465"
+            ],
+            [
+                "166f9b1d8a6ad43d"
+            ]
+        ]
+    },
+    {
+        "id": "727937e9065df465",
+        "type": "change",
+        "z": "f8267d55bb8665c3",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "topic",
+                "pt": "msg",
+                "to": "SELECT * FROM ModbusCounters",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 520,
+        "y": 180,
+        "wires": [
+            [
+                "bcf0258362e4a423"
+            ]
+        ]
+    },
+    {
+        "id": "60dd932672c09fa1",
+        "type": "http in",
+        "z": "f8267d55bb8665c3",
+        "name": "",
+        "url": "*",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 90,
+        "y": 800,
+        "wires": [
+            [
+                "d06bee6a1422dc9e"
+            ]
+        ]
+    },
+    {
+        "id": "166f9b1d8a6ad43d",
+        "type": "http response",
+        "z": "f8267d55bb8665c3",
+        "name": "",
+        "statusCode": "404",
+        "headers": {},
+        "x": 460,
+        "y": 220,
+        "wires": []
+    },
+    {
+        "id": "2f4eeba7407ba9c6",
+        "type": "http in",
+        "z": "f8267d55bb8665c3",
+        "name": "",
+        "url": "/api/devices",
+        "method": "post",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 110,
+        "y": 340,
+        "wires": [
+            [
+                "87122c7414d8fa7a"
+            ]
+        ]
+    },
+    {
+        "id": "b52cfd3ed1fda7d7",
+        "type": "mysql",
+        "z": "f8267d55bb8665c3",
+        "mydb": "608ff9c050d10945",
+        "name": "",
+        "x": 680,
+        "y": 340,
+        "wires": [
+            [
+                "ec8f52e7e0ea5fb6"
+            ]
+        ]
+    },
+    {
+        "id": "87122c7414d8fa7a",
+        "type": "function",
+        "z": "f8267d55bb8665c3",
+        "name": "Проверка",
+        "func": "const newDevice = msg.req.body\n\nmsg.payload = newDevice\n\nmsg.topic = `INSERT INTO ModbusCounters (ModbusID, Name, IsRequested, ValueRegAdr, ResetRegAdr, Screen)\nVALUES(:ModbusID, :Name, CONV(:IsRequested, 2, 10) + 0, :ValueRegAdr, :ResetRegAdr, :Screen);`\n\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 500,
+        "y": 340,
+        "wires": [
+            [
+                "b52cfd3ed1fda7d7"
+            ]
+        ]
+    },
+    {
+        "id": "9bd0282ad6e263bd",
+        "type": "http response",
+        "z": "f8267d55bb8665c3",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 1130,
+        "y": 340,
+        "wires": []
+    },
+    {
+        "id": "12993fa5c56d5556",
+        "type": "catch",
+        "z": "f8267d55bb8665c3",
+        "name": "",
+        "scope": [
+            "b52cfd3ed1fda7d7"
+        ],
+        "uncaught": false,
+        "x": 680,
+        "y": 400,
+        "wires": [
+            [
+                "90f55393f1d0d837"
+            ]
+        ]
+    },
+    {
+        "id": "90f55393f1d0d837",
+        "type": "change",
+        "z": "f8267d55bb8665c3",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "error",
+                "tot": "msg"
+            },
+            {
+                "t": "set",
+                "p": "statusCode",
+                "pt": "msg",
+                "to": "500",
+                "tot": "num"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 900,
+        "y": 400,
+        "wires": [
+            [
+                "9bd0282ad6e263bd"
+            ]
+        ]
+    },
+    {
+        "id": "ec8f52e7e0ea5fb6",
+        "type": "change",
+        "z": "f8267d55bb8665c3",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "req.body",
+                "tot": "msg"
+            },
+            {
+                "t": "set",
+                "p": "statusCode",
+                "pt": "msg",
+                "to": "201",
+                "tot": "num"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 900,
+        "y": 340,
+        "wires": [
+            [
+                "9bd0282ad6e263bd",
+                "3b36fa04cce40f0c"
+            ]
+        ]
+    },
+    {
+        "id": "d06bee6a1422dc9e",
+        "type": "http response",
+        "z": "f8267d55bb8665c3",
+        "name": "",
+        "statusCode": "404",
+        "headers": {},
+        "x": 320,
+        "y": 800,
+        "wires": []
+    },
+    {
+        "id": "3b36fa04cce40f0c",
+        "type": "link out",
+        "z": "f8267d55bb8665c3",
+        "name": "link out 2",
+        "mode": "link",
+        "links": [
+            "231fb27999873a06"
+        ],
+        "x": 1155,
+        "y": 420,
+        "wires": []
+    },
+    {
+        "id": "920457f91dd9615a",
+        "type": "http in",
+        "z": "f8267d55bb8665c3",
+        "name": "",
+        "url": "/api/device/:id",
+        "method": "delete",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 120,
+        "y": 500,
+        "wires": [
+            [
+                "81cb7dac5b5a9ffd"
+            ]
+        ]
+    },
+    {
+        "id": "b043d5e44e6b72db",
+        "type": "mysql",
+        "z": "f8267d55bb8665c3",
+        "mydb": "608ff9c050d10945",
+        "name": "",
+        "x": 700,
+        "y": 500,
+        "wires": [
+            [
+                "310deaa39557bf34"
+            ]
+        ]
+    },
+    {
+        "id": "7bebb1b21f450111",
+        "type": "http response",
+        "z": "f8267d55bb8665c3",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 1190,
+        "y": 500,
+        "wires": []
+    },
+    {
+        "id": "ab743cbfaef8131c",
+        "type": "catch",
+        "z": "f8267d55bb8665c3",
+        "name": "",
+        "scope": [
+            "b043d5e44e6b72db"
+        ],
+        "uncaught": false,
+        "x": 700,
+        "y": 560,
+        "wires": [
+            [
+                "5d611621b61a9cb7"
+            ]
+        ]
+    },
+    {
+        "id": "5d611621b61a9cb7",
+        "type": "change",
+        "z": "f8267d55bb8665c3",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "error",
+                "tot": "msg"
+            },
+            {
+                "t": "set",
+                "p": "statusCode",
+                "pt": "msg",
+                "to": "500",
+                "tot": "num"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 920,
+        "y": 560,
+        "wires": [
+            [
+                "7bebb1b21f450111"
+            ]
+        ]
+    },
+    {
+        "id": "310deaa39557bf34",
+        "type": "change",
+        "z": "f8267d55bb8665c3",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "statusCode",
+                "pt": "msg",
+                "to": "204",
+                "tot": "num"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 940,
+        "y": 500,
+        "wires": [
+            [
+                "7bebb1b21f450111",
+                "3b36fa04cce40f0c"
+            ]
+        ]
+    },
+    {
+        "id": "81cb7dac5b5a9ffd",
+        "type": "function",
+        "z": "f8267d55bb8665c3",
+        "name": "Проверка",
+        "func": "const newDevice = msg.req.body\n\nmsg.payload.id = msg.req.params.id\n\n\nmsg.topic = `DELETE FROM ModbusCounters WHERE((ModbusID = :id));`\n\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 320,
+        "y": 500,
+        "wires": [
+            [
+                "b043d5e44e6b72db"
+            ]
+        ]
+    },
+    {
+        "id": "5bebad459fee16cf",
+        "type": "http in",
+        "z": "f8267d55bb8665c3",
+        "name": "",
+        "url": "/api/device/:id",
+        "method": "put",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 110,
+        "y": 660,
+        "wires": [
+            [
+                "74af5832dac025a4"
+            ]
+        ]
+    },
+    {
+        "id": "b43dd66cf14e1b5c",
+        "type": "mysql",
+        "z": "f8267d55bb8665c3",
+        "mydb": "608ff9c050d10945",
+        "name": "",
+        "x": 700,
+        "y": 660,
+        "wires": [
+            [
+                "9d86644e1c7da117"
+            ]
+        ]
+    },
+    {
+        "id": "6281093da9b619cb",
+        "type": "http response",
+        "z": "f8267d55bb8665c3",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 1190,
+        "y": 660,
+        "wires": []
+    },
+    {
+        "id": "938ae3a063fa7cb6",
+        "type": "catch",
+        "z": "f8267d55bb8665c3",
+        "name": "",
+        "scope": [
+            "b43dd66cf14e1b5c"
+        ],
+        "uncaught": false,
+        "x": 700,
+        "y": 720,
+        "wires": [
+            [
+                "7da93835884595ae"
+            ]
+        ]
+    },
+    {
+        "id": "7da93835884595ae",
+        "type": "change",
+        "z": "f8267d55bb8665c3",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "error",
+                "tot": "msg"
+            },
+            {
+                "t": "set",
+                "p": "statusCode",
+                "pt": "msg",
+                "to": "500",
+                "tot": "num"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 920,
+        "y": 720,
+        "wires": [
+            [
+                "6281093da9b619cb"
+            ]
+        ]
+    },
+    {
+        "id": "74af5832dac025a4",
+        "type": "function",
+        "z": "f8267d55bb8665c3",
+        "name": "Проверка",
+        "func": "const newDevice = msg.req.body\n\nconst oldId = msg.req.params.id\n\n\nif (!global.get('devices').find(el => el.ModbusID == oldId)) return [undefined, msg]\n\nconst newParams = []\n\nfor (let prop in newDevice) {\n\n    if (prop === 'IsRequested') newParams.push(`${prop} = CONV(${newDevice[prop]}, 2, 10) + 0`)\n    else newParams.push(`${prop} = '${newDevice[prop]}'`)\n}\n\nmsg.topic = `UPDATE ModbusCounters SET ${newParams.join(\", \")} WHERE ModbusID = ${oldId}`\n\nreturn msg;",
+        "outputs": 2,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 320,
+        "y": 660,
+        "wires": [
+            [
+                "b43dd66cf14e1b5c"
+            ],
+            [
+                "87122c7414d8fa7a"
+            ]
+        ]
+    },
+    {
+        "id": "9d86644e1c7da117",
+        "type": "change",
+        "z": "f8267d55bb8665c3",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "req.body",
+                "tot": "msg"
+            },
+            {
+                "t": "set",
+                "p": "statusCode",
+                "pt": "msg",
+                "to": "200",
+                "tot": "num"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 920,
+        "y": 660,
+        "wires": [
+            [
+                "6281093da9b619cb",
+                "3b36fa04cce40f0c"
+            ]
+        ]
+    },
+    {
+        "id": "85651546faf9a34d",
         "type": "debug",
         "z": "f8267d55bb8665c3",
         "name": "debug 2",
@@ -494,7 +1141,7 @@
         "statusVal": "",
         "statusType": "auto",
         "x": 500,
-        "y": 360,
+        "y": 760,
         "wires": []
     },
     {
