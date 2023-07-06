@@ -2,15 +2,7 @@
     {
         "id": "d8f388f98592d062",
         "type": "tab",
-        "label": "Поток 1",
-        "disabled": true,
-        "info": "",
-        "env": []
-    },
-    {
-        "id": "dc35f1f13fade75e",
-        "type": "tab",
-        "label": "Поток 0",
+        "label": "Инициализация",
         "disabled": false,
         "info": "",
         "env": []
@@ -18,7 +10,23 @@
     {
         "id": "6e52c1301b78909b",
         "type": "tab",
-        "label": "Поток 2",
+        "label": "Modbus",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "f8267d55bb8665c3",
+        "type": "tab",
+        "label": "API",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "dc35f1f13fade75e",
+        "type": "tab",
+        "label": "Поток 0",
         "disabled": false,
         "info": "",
         "env": []
@@ -67,143 +75,426 @@
         "wholemsg": "false"
     },
     {
-        "id": "2baa9bc7.3878b4",
-        "type": "modbus-read",
+        "id": "6bd0068ce09f7195",
+        "type": "inject",
         "z": "d8f388f98592d062",
-        "name": "Температура",
-        "topic": "temp",
-        "showStatusActivities": false,
-        "logIOActivities": false,
-        "showErrors": false,
-        "showWarnings": true,
-        "unitid": "1",
-        "dataType": "InputRegister",
-        "adr": "1",
-        "quantity": "1",
-        "rate": "1",
-        "rateUnit": "s",
-        "delayOnStart": false,
-        "startDelayTime": "",
-        "server": "b8dd5dc2.87841",
-        "useIOFile": false,
-        "ioFile": "",
-        "useIOForPayload": false,
-        "emptyMsgOnFail": false,
-        "x": 210,
-        "y": 360,
+        "name": "Starten",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": "0.1",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 240,
+        "y": 100,
         "wires": [
             [
-                "5ecc1bd2af1ac89d"
-            ],
-            []
-        ]
-    },
-    {
-        "id": "b376694bf4e68cde",
-        "type": "mysql",
-        "z": "d8f388f98592d062",
-        "mydb": "608ff9c050d10945",
-        "name": "",
-        "x": 1180,
-        "y": 340,
-        "wires": [
-            []
-        ]
-    },
-    {
-        "id": "5ecc1bd2af1ac89d",
-        "type": "range",
-        "z": "d8f388f98592d062",
-        "minin": "4000",
-        "maxin": "20000",
-        "minout": "-19.4",
-        "maxout": "60.5",
-        "action": "scale",
-        "round": false,
-        "property": "payload",
-        "name": "",
-        "x": 430,
-        "y": 340,
-        "wires": [
-            [
-                "c93207d7c1215c19"
+                "17ad62f06497aae8"
             ]
         ]
     },
     {
-        "id": "c93207d7c1215c19",
+        "id": "17ad62f06497aae8",
         "type": "function",
         "z": "d8f388f98592d062",
-        "name": "",
-        "func": "let [date, time] = new Date().toLocaleString('ru-RU').split(', ')\ndate = date.split('.').reverse().join('-')\n\nmsg.payload = [`${date} ${time}`, +msg.payload.toFixed(1)]\nmsg.topic = \"INSERT INTO test VALUES (?, ?);\"\n\nconst msg1 = {\n    payload: {\n        temp: msg.payload[1]\n        }\n}\n\nreturn [msg, msg1];",
-        "outputs": 2,
+        "name": "Инициализация Global",
+        "func": "global.get('MODBUS_TCP_IP', 'file') || global.set('MODBUS_TCP_IP', '127.0.0.1', 'file')\nglobal.get('ATTEMPTS', 'file') || global.set('ATTEMPTS', 3, 'file')\nglobal.get('ERROR_TIME', 'file') || global.set('ERROR_TIME', 10000, 'file')",
+        "outputs": 0,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 640,
-        "y": 340,
-        "wires": [
-            [
-                "c31b619b9f6d95a4",
-                "6a3079b24b200196"
-            ],
-            [
-                "a72bca4b2ccb6e50"
-            ]
-        ]
-    },
-    {
-        "id": "a72bca4b2ccb6e50",
-        "type": "websocket out",
-        "z": "d8f388f98592d062",
-        "name": "",
-        "server": "f8eb90804d4934dd",
-        "client": "",
-        "x": 990,
-        "y": 420,
+        "x": 510,
+        "y": 100,
         "wires": []
     },
     {
-        "id": "c31b619b9f6d95a4",
-        "type": "delay",
+        "id": "f1a39dbdacbb6d43",
+        "type": "mysql",
         "z": "d8f388f98592d062",
+        "mydb": "608ff9c050d10945",
         "name": "",
-        "pauseType": "rate",
-        "timeout": "5",
-        "timeoutUnits": "seconds",
-        "rate": "1",
-        "nbRateUnits": "10",
-        "rateUnits": "second",
-        "randomFirst": "1",
-        "randomLast": "5",
-        "randomUnits": "seconds",
-        "drop": true,
-        "allowrate": false,
-        "outputs": 1,
-        "x": 970,
-        "y": 340,
+        "x": 400,
+        "y": 220,
         "wires": [
             [
-                "b376694bf4e68cde"
+                "0ebd02be01c41393"
             ]
         ]
     },
     {
-        "id": "6a3079b24b200196",
-        "type": "debug",
+        "id": "4db21af8c667f2c9",
+        "type": "inject",
         "z": "d8f388f98592d062",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": "0.5",
+        "topic": "SELECT * FROM ModbusCounters",
+        "payload": "",
+        "payloadType": "date",
+        "x": 220,
+        "y": 220,
+        "wires": [
+            [
+                "f1a39dbdacbb6d43"
+            ]
+        ]
+    },
+    {
+        "id": "0ebd02be01c41393",
+        "type": "function",
+        "z": "d8f388f98592d062",
+        "name": "Преобразование ответа",
+        "func": "for (const device of msg.payload) {\n    device.IsRequested = !!device.IsRequested.readInt8(0)\n}\nglobal.set('devices', msg.payload)\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 610,
+        "y": 220,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "ef35339b1f3e7897",
+        "type": "comment",
+        "z": "d8f388f98592d062",
+        "name": "Получение всех устройств из БД",
+        "info": "",
+        "x": 260,
+        "y": 180,
+        "wires": []
+    },
+    {
+        "id": "5c7d0c636d0abba8",
+        "type": "function",
+        "z": "6e52c1301b78909b",
+        "name": "Поменять местами байты",
+        "func": "const values = global.get('values')\n\nconst { modbusRequest: { unitid } } = msg\n\nconst buf = msg.payload.buffer.reverse()\n\n\nfor (let i = 0; i < buf.length; i=i+2) {\n    [buf[i], buf[i + 1]] = [buf[i+1], buf[i]];\n}\n\nvalues[unitid] = { value: buf.readInt32BE(0)}",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 780,
+        "y": 400,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "301faa842db8fef8",
+        "type": "modbus-flex-sequencer",
+        "z": "6e52c1301b78909b",
+        "name": "",
+        "sequences": [
+            {
+                "name": "Counter",
+                "unitid": "1",
+                "fc": "FC4",
+                "address": "1001",
+                "quantity": "2"
+            }
+        ],
+        "server": "b8dd5dc2.87841",
+        "showStatusActivities": false,
+        "showErrors": true,
+        "showWarnings": true,
+        "logIOActivities": false,
+        "useIOFile": false,
+        "ioFile": "",
+        "useIOForPayload": false,
+        "emptyMsgOnFail": false,
+        "keepMsgProperties": false,
+        "delayOnStart": false,
+        "startDelayTime": "",
+        "x": 420,
+        "y": 420,
+        "wires": [
+            [],
+            [
+                "5c7d0c636d0abba8"
+            ]
+        ]
+    },
+    {
+        "id": "c7f2674f6378e416",
+        "type": "inject",
+        "z": "6e52c1301b78909b",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "1",
+        "crontab": "",
+        "once": true,
+        "onceDelay": "1.1",
+        "topic": "",
+        "payload": "",
+        "payloadType": "str",
+        "x": 150,
+        "y": 300,
+        "wires": [
+            [
+                "fb09af9ead3704ba"
+            ]
+        ]
+    },
+    {
+        "id": "fb09af9ead3704ba",
+        "type": "function",
+        "z": "6e52c1301b78909b",
+        "name": "function 1",
+        "func": "const devices = global.get('devices')\n\nconst skipedDevs = flow.get('skipedDevs')\n\n\nconst requestedDevs = devices.filter(({ IsRequested, ModbusID }) => IsRequested && !skipedDevs.has(ModbusID))\n\nmsg.sequences = requestedDevs.map(el=>({\n    name: el.Name,\n    fc: 4,\n    address: el.ValueRegAdr,\n    unitid: el.ModbusID,\n    quantity: 2,    \n}))\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 200,
+        "y": 420,
+        "wires": [
+            [
+                "301faa842db8fef8"
+            ]
+        ]
+    },
+    {
+        "id": "accc94a8e437d04e",
+        "type": "modbus-flex-connector",
+        "z": "6e52c1301b78909b",
+        "name": "",
+        "maxReconnectsPerMinute": 4,
+        "emptyQueue": false,
+        "showStatusActivities": false,
+        "showErrors": false,
+        "server": "b8dd5dc2.87841",
+        "x": 630,
+        "y": 80,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "cd9b0f3aa0616ee9",
+        "type": "inject",
+        "z": "6e52c1301b78909b",
+        "name": "Starten",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": "1",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 140,
+        "y": 80,
+        "wires": [
+            [
+                "2fb2560dc6144677",
+                "0f6c5a1036729372"
+            ]
+        ]
+    },
+    {
+        "id": "2fb2560dc6144677",
+        "type": "function",
+        "z": "6e52c1301b78909b",
+        "name": "Конфиг Модбас",
+        "func": "msg.payload = {\n    connectorType: \"TCP\",\n    tcpHost: global.get('MODBUS_TCP_IP', 'file'),\n}\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 360,
+        "y": 80,
+        "wires": [
+            [
+                "accc94a8e437d04e"
+            ]
+        ]
+    },
+    {
+        "id": "3ff5677b1c510bec",
+        "type": "catch",
+        "z": "6e52c1301b78909b",
+        "name": "Ошибки Modbus",
+        "scope": [
+            "301faa842db8fef8"
+        ],
+        "uncaught": false,
+        "x": 300,
+        "y": 500,
+        "wires": [
+            [
+                "1d5aad3c74b2c0d4"
+            ]
+        ]
+    },
+    {
+        "id": "1d5aad3c74b2c0d4",
+        "type": "function",
+        "z": "6e52c1301b78909b",
+        "name": "function 2",
+        "func": "const errCtr = flow.get('errorsCounter')\n\nconst errId = msg.payload.unitid\n\nconst now = Date.now()\n\n\nif (errCtr[errId] && now - errCtr[errId].lastTime < global.get('ERROR_TIME', 'file')){\n    errCtr[errId].counter++\n    errCtr[errId].lastTime = Date.now()\n} else errCtr[errId] = { counter: 1, lastTime: now }\n\n\nif (errCtr[errId].counter >= global.get('ATTEMPTS', 'file')) {\n    const skipedDevs = flow.get('skipedDevs')\n    skipedDevs.add(errId)\n    delete errCtr[errId]\n}",
+        "outputs": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 520,
+        "y": 500,
+        "wires": []
+    },
+    {
+        "id": "0f6c5a1036729372",
+        "type": "function",
+        "z": "6e52c1301b78909b",
+        "name": "Инициализация контекста",
+        "func": "flow.set('errorsCounter', {})\nflow.set('skipedDevs', new Set())\nglobal.set('values', {})",
+        "outputs": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 400,
+        "y": 140,
+        "wires": []
+    },
+    {
+        "id": "6e138e93f1fec0cb",
+        "type": "inject",
+        "z": "6e52c1301b78909b",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "1",
+        "crontab": "",
+        "once": true,
+        "onceDelay": "2",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 270,
+        "y": 660,
+        "wires": [
+            [
+                "71976d13f1ada451"
+            ]
+        ]
+    },
+    {
+        "id": "71976d13f1ada451",
+        "type": "function",
+        "z": "6e52c1301b78909b",
+        "name": "function 3",
+        "func": "const devices = global.get('devices')\nconst skipedDevs = flow.get('skipedDevs')\nconst values = global.get('values')\n\nconst package = []\n\n\ndevices.forEach(( el )=>{\n\n\n\n    const id = el.ModbusID\n    const title = el.Name\n    const screen = el.Screen\n    const value = values[id]?.value || null\n\n    if (!screen) return\n\n    let status = 'ok'\n\n    if (!el.IsRequested) status = 'disabled'\n    else if (skipedDevs.has(id)) status = 'error'\n\n    package.push({ id, title, screen, status, value })   \n\n});\n\nmsg.payload = package\n\nif (package.length) return msg;\n",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 480,
+        "y": 660,
+        "wires": [
+            [
+                "fd9e7bdf516c2476"
+            ]
+        ]
+    },
+    {
+        "id": "fd9e7bdf516c2476",
+        "type": "link out",
+        "z": "6e52c1301b78909b",
+        "name": "link out 1",
+        "mode": "link",
+        "links": [
+            "1a9feb98b2b047d4"
+        ],
+        "x": 1205,
+        "y": 720,
+        "wires": []
+    },
+    {
+        "id": "84cf37ea77d8825f",
+        "type": "websocket out",
+        "z": "f8267d55bb8665c3",
+        "name": "",
+        "server": "f8eb90804d4934dd",
+        "client": "",
+        "x": 510,
+        "y": 260,
+        "wires": []
+    },
+    {
+        "id": "1a9feb98b2b047d4",
+        "type": "link in",
+        "z": "f8267d55bb8665c3",
+        "name": "link in 1",
+        "links": [
+            "fd9e7bdf516c2476"
+        ],
+        "x": 205,
+        "y": 260,
+        "wires": [
+            [
+                "84cf37ea77d8825f",
+                "d57e6458077688b2"
+            ]
+        ]
+    },
+    {
+        "id": "d57e6458077688b2",
+        "type": "debug",
+        "z": "f8267d55bb8665c3",
         "name": "debug 2",
         "active": true,
         "tosidebar": true,
         "console": false,
         "tostatus": false,
-        "complete": "true",
-        "targetType": "full",
+        "complete": "false",
         "statusVal": "",
         "statusType": "auto",
-        "x": 740,
-        "y": 500,
+        "x": 500,
+        "y": 360,
         "wires": []
     },
     {
@@ -313,293 +604,6 @@
         "statusType": "auto",
         "x": 1080,
         "y": 360,
-        "wires": []
-    },
-    {
-        "id": "5c7d0c636d0abba8",
-        "type": "function",
-        "z": "6e52c1301b78909b",
-        "name": "Поменять местами байты",
-        "func": "const buf = msg.payload.buffer.reverse()\n\nfor (let i = 0; i < buf.length; i=i+2) {\n    [buf[i], buf[i + 1]] = [buf[i+1], buf[i]];\n}\n\nmsg.payload = buf.readInt32BE(0)\nreturn msg;",
-        "outputs": 1,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 860,
-        "y": 400,
-        "wires": [
-            [
-                "61147e47a58a4407"
-            ]
-        ]
-    },
-    {
-        "id": "301faa842db8fef8",
-        "type": "modbus-flex-sequencer",
-        "z": "6e52c1301b78909b",
-        "name": "",
-        "sequences": [
-            {
-                "name": "Counter",
-                "unitid": "1",
-                "fc": "FC4",
-                "address": "1001",
-                "quantity": "2"
-            }
-        ],
-        "server": "b8dd5dc2.87841",
-        "showStatusActivities": false,
-        "showErrors": true,
-        "showWarnings": true,
-        "logIOActivities": false,
-        "useIOFile": false,
-        "ioFile": "",
-        "useIOForPayload": false,
-        "emptyMsgOnFail": false,
-        "keepMsgProperties": false,
-        "delayOnStart": false,
-        "startDelayTime": "",
-        "x": 540,
-        "y": 400,
-        "wires": [
-            [],
-            [
-                "5c7d0c636d0abba8"
-            ]
-        ]
-    },
-    {
-        "id": "c7f2674f6378e416",
-        "type": "inject",
-        "z": "6e52c1301b78909b",
-        "name": "",
-        "props": [
-            {
-                "p": "payload"
-            },
-            {
-                "p": "topic",
-                "vt": "str"
-            }
-        ],
-        "repeat": "1",
-        "crontab": "",
-        "once": false,
-        "onceDelay": 0.1,
-        "topic": "",
-        "payload": "",
-        "payloadType": "str",
-        "x": 110,
-        "y": 380,
-        "wires": [
-            [
-                "fb09af9ead3704ba"
-            ]
-        ]
-    },
-    {
-        "id": "fb09af9ead3704ba",
-        "type": "function",
-        "z": "6e52c1301b78909b",
-        "name": "function 1",
-        "func": "const devices = flow.get('devices')\n\nconst skipedDevs = flow.get('skipedDevs')\n\n\nconst requestedDevs = devices.filter(({ IsRequested, ModbusID }) => IsRequested && !skipedDevs.has(ModbusID))\n\nmsg.sequences = requestedDevs.map(el=>({\n    name: el.Name,\n    fc: 4,\n    address: el.ValueRegAdr,\n    unitid: el.ModbusID,\n    quantity: 2,    \n}))\n\nreturn msg;",
-        "outputs": 1,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 340,
-        "y": 400,
-        "wires": [
-            [
-                "301faa842db8fef8"
-            ]
-        ]
-    },
-    {
-        "id": "accc94a8e437d04e",
-        "type": "modbus-flex-connector",
-        "z": "6e52c1301b78909b",
-        "name": "",
-        "maxReconnectsPerMinute": 4,
-        "emptyQueue": false,
-        "showStatusActivities": false,
-        "showErrors": false,
-        "server": "b8dd5dc2.87841",
-        "x": 710,
-        "y": 60,
-        "wires": [
-            []
-        ]
-    },
-    {
-        "id": "cd9b0f3aa0616ee9",
-        "type": "inject",
-        "z": "6e52c1301b78909b",
-        "name": "Starten",
-        "props": [
-            {
-                "p": "payload"
-            }
-        ],
-        "repeat": "",
-        "crontab": "",
-        "once": true,
-        "onceDelay": "1",
-        "topic": "",
-        "payload": "",
-        "payloadType": "date",
-        "x": 120,
-        "y": 60,
-        "wires": [
-            [
-                "2fb2560dc6144677",
-                "0f6c5a1036729372"
-            ]
-        ]
-    },
-    {
-        "id": "2fb2560dc6144677",
-        "type": "function",
-        "z": "6e52c1301b78909b",
-        "name": "Конфиг Модбас",
-        "func": "msg.payload = {\n    connectorType: \"TCP\",\n   //tcpHost: env.get(\"MODBUS_TCP_IP\"),\n    tcpHost: '10.5.66.101',\n}\nreturn msg;",
-        "outputs": 1,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 340,
-        "y": 60,
-        "wires": [
-            [
-                "accc94a8e437d04e"
-            ]
-        ]
-    },
-    {
-        "id": "f1a39dbdacbb6d43",
-        "type": "mysql",
-        "z": "6e52c1301b78909b",
-        "mydb": "608ff9c050d10945",
-        "name": "",
-        "x": 320,
-        "y": 280,
-        "wires": [
-            [
-                "0ebd02be01c41393"
-            ]
-        ]
-    },
-    {
-        "id": "4db21af8c667f2c9",
-        "type": "inject",
-        "z": "6e52c1301b78909b",
-        "name": "",
-        "props": [
-            {
-                "p": "payload"
-            },
-            {
-                "p": "topic",
-                "vt": "str"
-            }
-        ],
-        "repeat": "",
-        "crontab": "",
-        "once": true,
-        "onceDelay": "1.1",
-        "topic": "SELECT * FROM ModbusCounters",
-        "payload": "",
-        "payloadType": "date",
-        "x": 140,
-        "y": 280,
-        "wires": [
-            [
-                "f1a39dbdacbb6d43"
-            ]
-        ]
-    },
-    {
-        "id": "0ebd02be01c41393",
-        "type": "function",
-        "z": "6e52c1301b78909b",
-        "name": "Преобразование ответа",
-        "func": "for (const device of msg.payload) {\n    device.IsRequested = !!device.IsRequested.readInt8(0)\n}\nflow.set('devices', msg.payload)\nreturn msg;",
-        "outputs": 1,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 550,
-        "y": 280,
-        "wires": [
-            []
-        ]
-    },
-    {
-        "id": "61147e47a58a4407",
-        "type": "debug",
-        "z": "6e52c1301b78909b",
-        "name": "debug 4",
-        "active": true,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "payload",
-        "targetType": "msg",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 1000,
-        "y": 500,
-        "wires": []
-    },
-    {
-        "id": "3ff5677b1c510bec",
-        "type": "catch",
-        "z": "6e52c1301b78909b",
-        "name": "Ошибки Modbus",
-        "scope": [
-            "301faa842db8fef8"
-        ],
-        "uncaught": false,
-        "x": 280,
-        "y": 540,
-        "wires": [
-            [
-                "1d5aad3c74b2c0d4"
-            ]
-        ]
-    },
-    {
-        "id": "1d5aad3c74b2c0d4",
-        "type": "function",
-        "z": "6e52c1301b78909b",
-        "name": "function 2",
-        "func": "const errCtr = flow.get('errorsCounter')\n\nconst errId = msg.payload.unitid\n\nconst now = Date.now()\n\n\nif (errCtr[errId] && now - errCtr[errId].lastTime  < 10000){\n    errCtr[errId].counter++\n    errCtr[errId].lastTime = Date.now()\n} else errCtr[errId] = { counter: 1, lastTime: now }\n\n\nif (errCtr[errId].counter >= 3) {\n    const skipedDevs = flow.get('skipedDevs')\n    skipedDevs.add(errId)\n    delete errCtr[errId]\n}",
-        "outputs": 0,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 500,
-        "y": 540,
-        "wires": []
-    },
-    {
-        "id": "0f6c5a1036729372",
-        "type": "function",
-        "z": "6e52c1301b78909b",
-        "name": "Инициализация контекста",
-        "func": "flow.set('errorsCounter', {})\nflow.set('skipedDevs', new Set())\n",
-        "outputs": 0,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 400,
-        "y": 120,
         "wires": []
     }
 ]
