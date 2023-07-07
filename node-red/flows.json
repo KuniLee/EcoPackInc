@@ -250,8 +250,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 800,
-        "y": 400,
+        "x": 780,
+        "y": 420,
         "wires": [
             []
         ]
@@ -468,8 +468,8 @@
         "topic": "",
         "payload": "",
         "payloadType": "date",
-        "x": 270,
-        "y": 680,
+        "x": 190,
+        "y": 960,
         "wires": [
             [
                 "71976d13f1ada451"
@@ -481,14 +481,14 @@
         "type": "function",
         "z": "6e52c1301b78909b",
         "name": "function 3",
-        "func": "const devices = global.get('devices') || []\nconst skipedDevs = flow.get('skipedDevs')\nconst values = global.get('values')\n\nconst package = []\n\n\ndevices.forEach(( el )=>{\n\n\n\n    const id = el.ModbusID\n    const title = el.Name\n    const screen = el.Screen\n    const value = values[id]?.value || null\n\n    if (!screen) return\n\n    let status = 'ok'\n\n    if (!el.IsRequested) status = 'disabled'\n    else if (skipedDevs.has(id)) status = 'error'\n\n    package.push({ id, title, screen, status, value })   \n\n});\n\nmsg.payload = package\n\nif (package.length) return msg;\n",
+        "func": "const devices = global.get('devices') || []\nconst skipedDevs = flow.get('skipedDevs')\nconst values = global.get('values')\n\nconst package = []\n\n\ndevices.forEach(( el )=>{\n\n    const id = el.ModbusID\n    const title = el.Name\n    const screen = el.Screen\n    const value = values[id]?.value || null\n\n    if (!screen) return\n\n    let status = 'ok'\n\n    if (!el.IsRequested) status = 'disabled'\n    else if (skipedDevs.has(id)) status = 'error'\n\n    package.push({ id, title, screen, status, value })   \n\n});\n\nmsg.payload = package\n\nif (package.length) return msg;\n",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 480,
-        "y": 680,
+        "x": 400,
+        "y": 960,
         "wires": [
             [
                 "fd9e7bdf516c2476"
@@ -504,8 +504,8 @@
         "links": [
             "1a9feb98b2b047d4"
         ],
-        "x": 985,
-        "y": 680,
+        "x": 875,
+        "y": 960,
         "wires": []
     },
     {
@@ -531,8 +531,102 @@
         "z": "6e52c1301b78909b",
         "name": "Переодическая отправка значений в websocket",
         "info": "",
-        "x": 380,
-        "y": 620,
+        "x": 300,
+        "y": 900,
+        "wires": []
+    },
+    {
+        "id": "ab2419fd7a78f6c8",
+        "type": "inject",
+        "z": "6e52c1301b78909b",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "60",
+        "crontab": "",
+        "once": true,
+        "onceDelay": "30",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 170,
+        "y": 700,
+        "wires": [
+            [
+                "86951c9a7ca3c52a"
+            ]
+        ]
+    },
+    {
+        "id": "d794e96c01b3f0d4",
+        "type": "modbus-flex-sequencer",
+        "z": "6e52c1301b78909b",
+        "name": "",
+        "sequences": [
+            {
+                "name": "Counter",
+                "unitid": "1",
+                "fc": "FC4",
+                "address": "1001",
+                "quantity": "2"
+            }
+        ],
+        "server": "b8dd5dc2.87841",
+        "showStatusActivities": false,
+        "showErrors": false,
+        "showWarnings": true,
+        "logIOActivities": false,
+        "useIOFile": false,
+        "ioFile": "",
+        "useIOForPayload": false,
+        "emptyMsgOnFail": false,
+        "keepMsgProperties": false,
+        "delayOnStart": false,
+        "startDelayTime": "",
+        "x": 700,
+        "y": 700,
+        "wires": [
+            [],
+            [
+                "16d165b0639e9cb8"
+            ]
+        ]
+    },
+    {
+        "id": "86951c9a7ca3c52a",
+        "type": "function",
+        "z": "6e52c1301b78909b",
+        "name": "Попытка опроса отключённых",
+        "func": "const devices = global.get('devices') || []\n\nconst skipedDevs = flow.get('skipedDevs')\n\n\nmsg.sequences = Array.from(skipedDevs).reduce((acc, el)=>{\n    const dev = devices.find(dev => dev.ModbusID == el)\n\n    if (dev.IsRequested) return [...acc, {\n        name: dev.Name,\n        fc: 4,\n        address: dev.ValueRegAdr,\n        unitid: dev.ModbusID,\n        quantity: 2,\n    }]\n    else {\n        skipedDevs.delete(el)\n        return acc\n    }\n\n},[])\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 410,
+        "y": 700,
+        "wires": [
+            [
+                "d794e96c01b3f0d4"
+            ]
+        ]
+    },
+    {
+        "id": "16d165b0639e9cb8",
+        "type": "function",
+        "z": "6e52c1301b78909b",
+        "name": "Исключить из пропущенных",
+        "func": "node.warn(msg)\n\nflow.get('skipedDevs').delete(+msg.unitId)",
+        "outputs": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1000,
+        "y": 720,
         "wires": []
     },
     {
@@ -1424,8 +1518,7 @@
         "y": 240,
         "wires": [
             [
-                "116be983.0bdd06",
-                "0e85931f841c50a9"
+                "116be983.0bdd06"
             ]
         ]
     },
@@ -1444,8 +1537,7 @@
         "y": 240,
         "wires": [
             [
-                "c888e5aa.be7428",
-                "0e85931f841c50a9"
+                "c888e5aa.be7428"
             ]
         ]
     },
@@ -1470,22 +1562,5 @@
         "wires": [
             []
         ]
-    },
-    {
-        "id": "0e85931f841c50a9",
-        "type": "debug",
-        "z": "dc35f1f13fade75e",
-        "name": "debug 1",
-        "active": false,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "true",
-        "targetType": "full",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 1080,
-        "y": 360,
-        "wires": []
     }
 ]
