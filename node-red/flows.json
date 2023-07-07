@@ -120,36 +120,11 @@
         "z": "d8f388f98592d062",
         "mydb": "608ff9c050d10945",
         "name": "",
-        "x": 620,
+        "x": 740,
         "y": 260,
         "wires": [
             [
                 "0ebd02be01c41393"
-            ]
-        ]
-    },
-    {
-        "id": "4db21af8c667f2c9",
-        "type": "inject",
-        "z": "d8f388f98592d062",
-        "name": "",
-        "props": [
-            {
-                "p": "payload"
-            }
-        ],
-        "repeat": "",
-        "crontab": "",
-        "once": true,
-        "onceDelay": "0.5",
-        "topic": "",
-        "payload": "",
-        "payloadType": "date",
-        "x": 160,
-        "y": 260,
-        "wires": [
-            [
-                "d43fee0fedd81d84"
             ]
         ]
     },
@@ -164,7 +139,7 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 850,
+        "x": 970,
         "y": 260,
         "wires": [
             []
@@ -186,10 +161,9 @@
         "z": "d8f388f98592d062",
         "name": "init devices",
         "links": [
-            "3b36fa04cce40f0c",
-            "87b2af39a5351a4d"
+            "3b36fa04cce40f0c"
         ],
-        "x": 155,
+        "x": 215,
         "y": 340,
         "wires": [
             [
@@ -216,11 +190,70 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 420,
+        "x": 540,
         "y": 260,
         "wires": [
             [
                 "f1a39dbdacbb6d43"
+            ]
+        ]
+    },
+    {
+        "id": "52fdc354548ab5dd",
+        "type": "debug",
+        "z": "d8f388f98592d062",
+        "name": "debug 3",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 520,
+        "y": 440,
+        "wires": []
+    },
+    {
+        "id": "1bf80087749d8199",
+        "type": "status",
+        "z": "d8f388f98592d062",
+        "name": "",
+        "scope": [
+            "f1a39dbdacbb6d43"
+        ],
+        "x": 60,
+        "y": 260,
+        "wires": [
+            [
+                "f846483f495661d8"
+            ]
+        ]
+    },
+    {
+        "id": "f846483f495661d8",
+        "type": "switch",
+        "z": "d8f388f98592d062",
+        "name": "",
+        "property": "status.text",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "connected",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 230,
+        "y": 260,
+        "wires": [
+            [
+                "d43fee0fedd81d84",
+                "52fdc354548ab5dd"
             ]
         ]
     },
@@ -310,7 +343,7 @@
         "type": "function",
         "z": "6e52c1301b78909b",
         "name": "function 1",
-        "func": "const devices = global.get('devices')\n\nconst skipedDevs = flow.get('skipedDevs')\n\n\nconst requestedDevs = devices.filter(({ IsRequested, ModbusID }) => IsRequested && !skipedDevs.has(ModbusID))\n\nmsg.sequences = requestedDevs.map(el=>({\n    name: el.Name,\n    fc: 4,\n    address: el.ValueRegAdr,\n    unitid: el.ModbusID,\n    quantity: 2,    \n}))\n\nreturn msg;",
+        "func": "const devices = global.get('devices') || []\n\nconst skipedDevs = flow.get('skipedDevs')\n\n\nconst requestedDevs = devices.filter(({ IsRequested, ModbusID }) => IsRequested && !skipedDevs.has(ModbusID))\n\nmsg.sequences = requestedDevs.map(el=>({\n    name: el.Name,\n    fc: 4,\n    address: el.ValueRegAdr,\n    unitid: el.ModbusID,\n    quantity: 2,    \n}))\n\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
@@ -466,7 +499,7 @@
         "type": "function",
         "z": "6e52c1301b78909b",
         "name": "function 3",
-        "func": "const devices = global.get('devices')\nconst skipedDevs = flow.get('skipedDevs')\nconst values = global.get('values')\n\nconst package = []\n\n\ndevices.forEach(( el )=>{\n\n\n\n    const id = el.ModbusID\n    const title = el.Name\n    const screen = el.Screen\n    const value = values[id]?.value || null\n\n    if (!screen) return\n\n    let status = 'ok'\n\n    if (!el.IsRequested) status = 'disabled'\n    else if (skipedDevs.has(id)) status = 'error'\n\n    package.push({ id, title, screen, status, value })   \n\n});\n\nmsg.payload = package\n\nif (package.length) return msg;\n",
+        "func": "const devices = global.get('devices') || []\nconst skipedDevs = flow.get('skipedDevs')\nconst values = global.get('values')\n\nconst package = []\n\n\ndevices.forEach(( el )=>{\n\n\n\n    const id = el.ModbusID\n    const title = el.Name\n    const screen = el.Screen\n    const value = values[id]?.value || null\n\n    if (!screen) return\n\n    let status = 'ok'\n\n    if (!el.IsRequested) status = 'disabled'\n    else if (skipedDevs.has(id)) status = 'error'\n\n    package.push({ id, title, screen, status, value })   \n\n});\n\nmsg.payload = package\n\nif (package.length) return msg;\n",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
@@ -734,11 +767,12 @@
         "z": "f8267d55bb8665c3",
         "name": "",
         "scope": [
-            "b52cfd3ed1fda7d7"
+            "b52cfd3ed1fda7d7",
+            "bcf0258362e4a423"
         ],
         "uncaught": false,
         "x": 680,
-        "y": 400,
+        "y": 260,
         "wires": [
             [
                 "90f55393f1d0d837"
@@ -771,8 +805,8 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 900,
-        "y": 400,
+        "x": 920,
+        "y": 260,
         "wires": [
             [
                 "9bd0282ad6e263bd"
