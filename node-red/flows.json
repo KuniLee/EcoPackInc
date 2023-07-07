@@ -487,7 +487,7 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 400,
+        "x": 500,
         "y": 960,
         "wires": [
             [
@@ -1490,8 +1490,8 @@
         "topic": "",
         "payload": "",
         "payloadType": "date",
-        "x": 200,
-        "y": 240,
+        "x": 220,
+        "y": 180,
         "wires": [
             [
                 "af7d7058.5db5c"
@@ -1514,8 +1514,8 @@
         "authType": "",
         "senderr": false,
         "headers": [],
-        "x": 480,
-        "y": 240,
+        "x": 500,
+        "y": 180,
         "wires": [
             [
                 "116be983.0bdd06"
@@ -1533,8 +1533,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 720,
-        "y": 240,
+        "x": 760,
+        "y": 180,
         "wires": [
             [
                 "c888e5aa.be7428"
@@ -1557,10 +1557,80 @@
         "authType": "",
         "senderr": false,
         "headers": [],
-        "x": 1000,
-        "y": 240,
+        "x": 1080,
+        "y": 180,
         "wires": [
             []
         ]
+    },
+    {
+        "id": "1e186cfcf1942757",
+        "type": "mysql",
+        "z": "dc35f1f13fade75e",
+        "mydb": "608ff9c050d10945",
+        "name": "",
+        "x": 660,
+        "y": 300,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "08600ded3b72ae71",
+        "type": "template",
+        "z": "dc35f1f13fade75e",
+        "name": "",
+        "field": "topic",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "SET NAMES utf8mb4;\n\nCREATE TABLE IF NOT EXISTS `ModbusCounters` (\n  `ModbusID` tinyint unsigned NOT NULL COMMENT 'Id модбас устройства',\n  `Name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT 'Отображаемое имя',\n  `IsRequested` bit(1) NOT NULL COMMENT 'Опрашивается или нет',\n  `ValueRegAdr` smallint unsigned NOT NULL DEFAULT '1001' COMMENT 'Адрес регистра текущего значения',\n  `ResetRegAdr` smallint unsigned NOT NULL DEFAULT '1' COMMENT 'Адрес Coil сброса',\n  `Screen` tinyint unsigned NOT NULL COMMENT 'Экран для отображения',\n  PRIMARY KEY (`ModbusID`)\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;",
+        "output": "str",
+        "x": 460,
+        "y": 300,
+        "wires": [
+            [
+                "1e186cfcf1942757"
+            ]
+        ]
+    },
+    {
+        "id": "c05fa34c6a57ba21",
+        "type": "inject",
+        "z": "dc35f1f13fade75e",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": "0.2",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 220,
+        "y": 300,
+        "wires": [
+            [
+                "08600ded3b72ae71"
+            ]
+        ]
+    },
+    {
+        "id": "92c4456dc21a5d90",
+        "type": "comment",
+        "z": "dc35f1f13fade75e",
+        "name": "Создание таблиц",
+        "info": "",
+        "x": 190,
+        "y": 260,
+        "wires": []
     }
 ]
