@@ -30,6 +30,7 @@ services:
     tty: true
     environment:
       TZ: Asia/Yekaterinburg
+      MYSQL_IP: ${MYSQL_IP_ENV}
     volumes:
       - ./settings:/data/context/global
 
