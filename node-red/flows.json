@@ -636,8 +636,8 @@
         "name": "",
         "server": "f8eb90804d4934dd",
         "client": "",
-        "x": 430,
-        "y": 40,
+        "x": 490,
+        "y": 20,
         "wires": []
     },
     {
@@ -649,7 +649,7 @@
             "fd9e7bdf516c2476"
         ],
         "x": 185,
-        "y": 40,
+        "y": 20,
         "wires": [
             [
                 "84cf37ea77d8825f",
@@ -1469,7 +1469,7 @@
         "complete": "false",
         "statusVal": "",
         "statusType": "auto",
-        "x": 440,
+        "x": 480,
         "y": 80,
         "wires": []
     },
