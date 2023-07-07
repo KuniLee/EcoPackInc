@@ -110,7 +110,7 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 510,
+        "x": 470,
         "y": 100,
         "wires": []
     },
@@ -120,7 +120,7 @@
         "z": "d8f388f98592d062",
         "mydb": "608ff9c050d10945",
         "name": "",
-        "x": 740,
+        "x": 840,
         "y": 260,
         "wires": [
             [
@@ -139,7 +139,7 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 970,
+        "x": 1070,
         "y": 260,
         "wires": [
             []
@@ -151,8 +151,8 @@
         "z": "d8f388f98592d062",
         "name": "Получение всех устройств из БД",
         "info": "",
-        "x": 260,
-        "y": 180,
+        "x": 240,
+        "y": 200,
         "wires": []
     },
     {
@@ -163,7 +163,7 @@
         "links": [
             "3b36fa04cce40f0c"
         ],
-        "x": 215,
+        "x": 315,
         "y": 340,
         "wires": [
             [
@@ -190,30 +190,13 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 540,
+        "x": 640,
         "y": 260,
         "wires": [
             [
                 "f1a39dbdacbb6d43"
             ]
         ]
-    },
-    {
-        "id": "52fdc354548ab5dd",
-        "type": "debug",
-        "z": "d8f388f98592d062",
-        "name": "debug 3",
-        "active": true,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "true",
-        "targetType": "full",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 520,
-        "y": 440,
-        "wires": []
     },
     {
         "id": "1bf80087749d8199",
@@ -223,7 +206,7 @@
         "scope": [
             "f1a39dbdacbb6d43"
         ],
-        "x": 60,
+        "x": 160,
         "y": 260,
         "wires": [
             [
@@ -248,12 +231,11 @@
         "checkall": "true",
         "repair": false,
         "outputs": 1,
-        "x": 230,
+        "x": 370,
         "y": 260,
         "wires": [
             [
-                "d43fee0fedd81d84",
-                "52fdc354548ab5dd"
+                "d43fee0fedd81d84"
             ]
         ]
     },
@@ -533,8 +515,8 @@
         "name": "",
         "server": "f8eb90804d4934dd",
         "client": "",
-        "x": 470,
-        "y": 60,
+        "x": 430,
+        "y": 40,
         "wires": []
     },
     {
@@ -545,8 +527,8 @@
         "links": [
             "fd9e7bdf516c2476"
         ],
-        "x": 225,
-        "y": 60,
+        "x": 185,
+        "y": 40,
         "wires": [
             [
                 "84cf37ea77d8825f"
@@ -624,6 +606,11 @@
         "rules": [
             {
                 "t": "eq",
+                "v": "settings",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
                 "v": "devices",
                 "vt": "str"
             },
@@ -633,10 +620,13 @@
         ],
         "checkall": "true",
         "repair": false,
-        "outputs": 2,
+        "outputs": 3,
         "x": 310,
         "y": 180,
         "wires": [
+            [
+                "c44517cb4f2c3564"
+            ],
             [
                 "727937e9065df465"
             ],
@@ -681,8 +671,8 @@
         "method": "get",
         "upload": false,
         "swaggerDoc": "",
-        "x": 90,
-        "y": 800,
+        "x": 70,
+        "y": 120,
         "wires": [
             [
                 "d06bee6a1422dc9e"
@@ -855,8 +845,8 @@
         "name": "",
         "statusCode": "404",
         "headers": {},
-        "x": 320,
-        "y": 800,
+        "x": 300,
+        "y": 120,
         "wires": []
     },
     {
@@ -1163,20 +1153,23 @@
         ]
     },
     {
-        "id": "85651546faf9a34d",
-        "type": "debug",
+        "id": "c44517cb4f2c3564",
+        "type": "function",
         "z": "f8267d55bb8665c3",
-        "name": "debug 2",
-        "active": true,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "false",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 500,
-        "y": 760,
-        "wires": []
+        "name": "function 4",
+        "func": "const keys = global.keys('file');\n\nconst settings = {}\n\nkeys.forEach(el=>{\n    settings[el] = global.get(el, 'file')\n})\n\nmsg.payload = settings\n\nmsg.headers = {\n    'content-type': 'application/json'\n}\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 800,
+        "y": 120,
+        "wires": [
+            [
+                "266c286f.d993d8"
+            ]
+        ]
     },
     {
         "id": "39dd64a2.77696c",

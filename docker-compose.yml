@@ -30,8 +30,8 @@ services:
     tty: true
     environment:
       TZ: Asia/Yekaterinburg
-      MODBUS_TCP_IP: ${MODBUS_TCP_IP}
-      MYSQL_IP: ${MYSQL_IP_ENV}
+    volumes:
+      - ./settings:/data/context/global
 
   mysql:
     image: mysql:8
