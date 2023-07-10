@@ -2,9 +2,14 @@
 
 @layer base {
     html {
-        @apply text-white;
+        @apply text-white bg-dark;
     }
 }
 
 @tailwind components;
 @tailwind utilities;
+
+@font-face {
+    font-family: "JetBrains Mono";
+    src: url("../assets/fonts/JetBrainsMono-Regular.ttf");
+}

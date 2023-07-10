@@ -7,10 +7,13 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['Product Sans', ...defaultTheme.fontFamily.sans],
+        sans: ['JetBrains Mono', ...defaultTheme.fontFamily.sans],
+      },
+      colors: {
+        dark: '#0e210e',
       },
     },
   },
-  plugins: [require('tw-elements-react/dist/plugin.cjs')],
+  plugins: [require('tw-elements-react/dist/plugin.cjs'), require('@tailwindcss/container-queries')],
   darkMode: 'class',
 }

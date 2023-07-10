@@ -7,13 +7,16 @@ type CardProps = {
 
 const Card: FC<CardProps> = ({ data }) => {
   return (
-    <div className="aspect-square border-2 bg-violet-400 rounded-xl border-green-500 p-2">
-      {/*<ul>*/}
-      {/*  <li>Имя: {data.title}</li>*/}
-      {/*  <li>Адресс: {data.id}</li>*/}
-      {/*  <li>Статус: {data.status}</li>*/}
-      {/*  <li className="text-2xl">Значение: {data.value || '----'}</li>*/}
-      {/*</ul>*/}
+    <div className="@container">
+      <div className="@[900px]:text-6xl @[600px]:text-5xl @[400px]:text-4xl @[350px]:text-2xl @[280px]:text-xl aspect-square border-[0.2em] rounded-xl border-green-600 bg-emerald-900 p-2">
+        <h5 className="text-center text-[1.25em]">{data.title}</h5>
+        {/*<ul>*/}
+        {/*  <li>Имя: {data.title}</li>*/}
+        {/*  <li>Адресс: {data.id}</li>*/}
+        {/*  <li>Статус: {data.status}</li>*/}
+        {/*  <li className="text-2xl">Значение: {data.value || '----'}</li>*/}
+        {/*</ul>*/}
+      </div>
     </div>
   )
 }

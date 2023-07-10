@@ -505,7 +505,8 @@
         "y": 960,
         "wires": [
             [
-                "f1a1f104ea0bff18"
+                "f1a1f104ea0bff18",
+                "8f07da727d98e78b"
             ]
         ]
     },
@@ -639,6 +640,23 @@
         "client": "",
         "x": 870,
         "y": 960,
+        "wires": []
+    },
+    {
+        "id": "8f07da727d98e78b",
+        "type": "debug",
+        "z": "6e52c1301b78909b",
+        "name": "debug 1",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 720,
+        "y": 1040,
         "wires": []
     },
     {
