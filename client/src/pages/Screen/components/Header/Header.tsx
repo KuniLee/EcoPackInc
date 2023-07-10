@@ -1,10 +1,32 @@
-import { FC } from 'react'
+import { FC, useEffect, useState } from 'react'
+import useWebSocket from 'react-use-websocket'
+
+type WebSocketMsg = {
+  time: string
+  stage: string
+}
 
 const Header: FC = () => {
+  const [data, setData] = useState<WebSocketMsg>()
+
+  const { lastJsonMessage } = useWebSocket<WebSocketMsg>(`ws://${window.location.hostname}:1880/ws/time`, {
+    shouldReconnect: () => true,
+  })
+
+  useEffect(() => {
+    if (lastJsonMessage !== null) {
+      setData(lastJsonMessage)
+    }
+  }, [lastJsonMessage])
+
   return (
-    <header className="flex text-6xl p-4 justify-between">
-      <span>Смена А</span>
-      <time>15 мая 15:00</time>
+    <header className="h-24 flex relative text-6xl py-4 justify-between">
+      {data && (
+        <>
+          <span>Смена {data.stage}</span>
+          <time>{data.time}</time>
+        </>
+      )}
     </header>
   )
 }

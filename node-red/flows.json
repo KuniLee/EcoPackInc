@@ -1618,11 +1618,11 @@
         "output": "payload",
         "outputType": "msg",
         "outTz": "Asia/Yekaterinburg",
-        "x": 560,
-        "y": 260,
+        "x": 600,
+        "y": 200,
         "wires": [
             [
-                "0ffb7b2d93f5ec64"
+                "35b45ec84dcfa0b5"
             ]
         ]
     },
@@ -1643,8 +1643,8 @@
         "topic": "",
         "payload": "",
         "payloadType": "date",
-        "x": 270,
-        "y": 260,
+        "x": 290,
+        "y": 200,
         "wires": [
             [
                 "df44bd15fd1035b1"
@@ -1658,8 +1658,77 @@
         "name": "",
         "server": "e0707ccdfb3f12e8",
         "client": "",
-        "x": 810,
-        "y": 260,
+        "x": 1070,
+        "y": 200,
         "wires": []
+    },
+    {
+        "id": "c921e35b28eb862f",
+        "type": "inject",
+        "z": "7e68559fb83a6c0a",
+        "name": "Смена",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "А",
+        "payloadType": "str",
+        "x": 340,
+        "y": 320,
+        "wires": [
+            [
+                "42bd0d46e0b9dabb"
+            ]
+        ]
+    },
+    {
+        "id": "42bd0d46e0b9dabb",
+        "type": "change",
+        "z": "7e68559fb83a6c0a",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "stage",
+                "pt": "flow",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 580,
+        "y": 320,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "35b45ec84dcfa0b5",
+        "type": "function",
+        "z": "7e68559fb83a6c0a",
+        "name": "function 4",
+        "func": "msg.payload = {\n    time: msg.payload,\n    stage: flow.get('stage')\n}\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 840,
+        "y": 200,
+        "wires": [
+            [
+                "0ffb7b2d93f5ec64"
+            ]
+        ]
     }
 ]
