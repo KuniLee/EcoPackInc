@@ -24,6 +24,8 @@ services:
   node-red:
     image: kunilee/node-red:latest
     container_name: node-red
+    depends_on:
+      - mysql
     restart: always
     ports:
       - "1880:1880"
