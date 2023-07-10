@@ -10,6 +10,7 @@
     "dependencies": {
         "node-red": "3.0.2",
         "node-red-contrib-modbus": "~5.26.0",
+        "node-red-contrib-moment": "~4.0.0",
         "node-red-node-mysql": "~1.0.3"
     }
 }

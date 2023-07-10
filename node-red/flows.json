@@ -32,6 +32,14 @@
         "env": []
     },
     {
+        "id": "7e68559fb83a6c0a",
+        "type": "tab",
+        "label": "Смена/время",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
         "id": "b8dd5dc2.87841",
         "type": "modbus-client",
         "name": "modbusTCPserver",
@@ -72,6 +80,12 @@
         "id": "f8eb90804d4934dd",
         "type": "websocket-listener",
         "path": "/ws/test",
+        "wholemsg": "false"
+    },
+    {
+        "id": "e0707ccdfb3f12e8",
+        "type": "websocket-listener",
+        "path": "/ws/time",
         "wholemsg": "false"
     },
     {
@@ -491,22 +505,9 @@
         "y": 960,
         "wires": [
             [
-                "fd9e7bdf516c2476"
+                "f1a1f104ea0bff18"
             ]
         ]
-    },
-    {
-        "id": "fd9e7bdf516c2476",
-        "type": "link out",
-        "z": "6e52c1301b78909b",
-        "name": "link out 1",
-        "mode": "link",
-        "links": [
-            "1a9feb98b2b047d4"
-        ],
-        "x": 875,
-        "y": 960,
-        "wires": []
     },
     {
         "id": "61aced3fbb77aa02",
@@ -630,32 +631,15 @@
         "wires": []
     },
     {
-        "id": "84cf37ea77d8825f",
+        "id": "f1a1f104ea0bff18",
         "type": "websocket out",
-        "z": "f8267d55bb8665c3",
+        "z": "6e52c1301b78909b",
         "name": "",
         "server": "f8eb90804d4934dd",
         "client": "",
-        "x": 490,
-        "y": 20,
+        "x": 870,
+        "y": 960,
         "wires": []
-    },
-    {
-        "id": "1a9feb98b2b047d4",
-        "type": "link in",
-        "z": "f8267d55bb8665c3",
-        "name": "link in 1",
-        "links": [
-            "fd9e7bdf516c2476"
-        ],
-        "x": 185,
-        "y": 20,
-        "wires": [
-            [
-                "84cf37ea77d8825f",
-                "7d749290b01d2137"
-            ]
-        ]
     },
     {
         "id": "59ff2a1.fa600d4",
@@ -1458,22 +1442,6 @@
         "wires": []
     },
     {
-        "id": "7d749290b01d2137",
-        "type": "debug",
-        "z": "f8267d55bb8665c3",
-        "name": "debug 2",
-        "active": true,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "false",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 480,
-        "y": 80,
-        "wires": []
-    },
-    {
         "id": "39dd64a2.77696c",
         "type": "inject",
         "z": "dc35f1f13fade75e",
@@ -1630,6 +1598,67 @@
         "name": "Создание таблиц",
         "info": "",
         "x": 190,
+        "y": 260,
+        "wires": []
+    },
+    {
+        "id": "df44bd15fd1035b1",
+        "type": "moment",
+        "z": "7e68559fb83a6c0a",
+        "name": "",
+        "topic": "",
+        "input": "payload",
+        "inputType": "msg",
+        "inTz": "Asia/Yekaterinburg",
+        "adjAmount": 0,
+        "adjType": "days",
+        "adjDir": "add",
+        "format": "D MMM HH:mm",
+        "locale": "ru-RU",
+        "output": "payload",
+        "outputType": "msg",
+        "outTz": "Asia/Yekaterinburg",
+        "x": 560,
+        "y": 260,
+        "wires": [
+            [
+                "0ffb7b2d93f5ec64"
+            ]
+        ]
+    },
+    {
+        "id": "666fcdacff7783af",
+        "type": "inject",
+        "z": "7e68559fb83a6c0a",
+        "name": "Время сервера",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "10",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 270,
+        "y": 260,
+        "wires": [
+            [
+                "df44bd15fd1035b1"
+            ]
+        ]
+    },
+    {
+        "id": "0ffb7b2d93f5ec64",
+        "type": "websocket out",
+        "z": "7e68559fb83a6c0a",
+        "name": "",
+        "server": "e0707ccdfb3f12e8",
+        "client": "",
+        "x": 810,
         "y": 260,
         "wires": []
     }
