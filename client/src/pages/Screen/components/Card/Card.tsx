@@ -1,6 +1,7 @@
 import { FC } from 'react'
 import { DeviceData } from '@/models/types'
 import cx from 'classnames'
+import Progress from '@/UI/Progress'
 
 type CardProps = {
   data: DeviceData
@@ -20,6 +21,7 @@ const Card: FC<CardProps> = ({ data: { status, title, value, performance } }) =>
             '@[270px]:text-xl aspect-square border-[0.2em] rounded-xl p-2'
         )}>
         <h5 className="text-center leading-none text-[1em]">{title}</h5>
+        <Progress percent={50} />
         <div className="flex flex-col">
           <span className="mb-2 leading-none text-[0.75em]">Значение: </span>
           <span className="mb-6 leading-none @[900px]:text-[4em] @[400px]:text-[3em] text-[3.2em] self-center">

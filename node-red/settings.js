@@ -11,19 +11,19 @@
  *    https://nodered.org/docs/user-guide/runtime/configuration
  *
  * The settings are split into the following sections:
- *  - Flow File and User Directory Settings
+ *  - Flow File and User Directory Devices
  *  - Security
- *  - Server Settings
- *  - Runtime Settings
- *  - Editor Settings
- *  - Node Settings
+ *  - Server Devices
+ *  - Runtime Devices
+ *  - Editor Devices
+ *  - Node Devices
  *
  **/
 
 module.exports = {
 
 /*******************************************************************************
- * Flow File and User Directory Settings
+ * Flow File and User Directory Devices
  *  - flowFile
  *  - credentialSecret
  *  - flowFilePretty
@@ -126,7 +126,7 @@ module.exports = {
     //httpStaticAuth: {user:"user",pass:"$2a$08$zZWtXTja0fB1pzD4sHCMyOCMYz2Z6dNbM6tl8sJogENOMcxWV9DN."},
 
 /*******************************************************************************
- * Server Settings
+ * Server Devices
  *  - uiPort
  *  - uiHost
  *  - apiMaxLength
@@ -240,7 +240,7 @@ module.exports = {
     //httpStaticRoot: '/static/',
 
 /*******************************************************************************
- * Runtime Settings
+ * Runtime Devices
  *  - lang
  *  - runtimeState
  *  - diagnostics
@@ -352,7 +352,7 @@ module.exports = {
 
 
 /*******************************************************************************
- * Editor Settings
+ * Editor Devices
  *  - disableEditor
  *  - editorTheme
  ******************************************************************************/
@@ -396,7 +396,7 @@ module.exports = {
                  *  - manual - you must manually commit changes
                  *  - auto - changes are automatically committed
                  * This can be overridden per-user from the 'Git config'
-                 * section of 'User Settings' within the editor
+                 * section of 'User Devices' within the editor
                  */
                 mode: "manual"
             }
@@ -426,7 +426,7 @@ module.exports = {
     },
 
 /*******************************************************************************
- * Node Settings
+ * Node Devices
  *  - fileWorkingDirectory
  *  - functionGlobalContext
  *  - functionExternalModules

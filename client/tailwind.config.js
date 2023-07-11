@@ -10,6 +10,7 @@ export default {
         sans: ['JetBrains Mono', ...defaultTheme.fontFamily.sans],
       },
       colors: {
+        primary: '#14ef0c',
         dark: '#0e210e',
       },
     },
