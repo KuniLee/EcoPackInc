@@ -5,5 +5,6 @@ export type DeviceData = {
   title: string
   screen: number
   status: DeviceStatus
-  value: number
+  value: number | null
+  performance: number | null
 }

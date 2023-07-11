@@ -79,7 +79,7 @@
     {
         "id": "f8eb90804d4934dd",
         "type": "websocket-listener",
-        "path": "/ws/test",
+        "path": "/ws/data",
         "wholemsg": "false"
     },
     {
@@ -258,9 +258,9 @@
         "type": "function",
         "z": "6e52c1301b78909b",
         "name": "Поменять местами байты",
-        "func": "const values = global.get('values')\n\nconst { modbusRequest: { unitid } } = msg\n\nconst buf = msg.payload.buffer.reverse()\n\n\nfor (let i = 0; i < buf.length; i=i+2) {\n    [buf[i], buf[i + 1]] = [buf[i+1], buf[i]];\n}\n\nvalues[unitid] = { value: buf.readInt32BE(0)}",
+        "func": "const values = global.get('values')\n\nfunction calcPerformance (){\n    this.performance = Math.round((newValue - this.value) * 60000  / (timestamp - this.timestamp))\n    this.value = newValue\n    this.timestamp = timestamp\n}\n\nconst timestamp = Date.now()\n\nconst { modbusRequest: { unitid } } = msg\n\nconst buf = msg.payload.buffer.reverse()\n\nfor (let i = 0; i < buf.length; i=i+2) {\n    [buf[i], buf[i + 1]] = [buf[i+1], buf[i]];\n}\n\nconst newValue = buf.readInt32BE(0)\n\nif (values.hasOwnProperty(unitid)) \ncalcPerformance.call(values[unitid])\nelse\nvalues[unitid] = {\n        value: newValue,\n        timestamp\n    }",
         "outputs": 1,
-        "noerr": 0,
+        "noerr": 3,
         "initialize": "",
         "finalize": "",
         "libs": [],
@@ -495,7 +495,7 @@
         "type": "function",
         "z": "6e52c1301b78909b",
         "name": "function 3",
-        "func": "const devices = global.get('devices') || []\nconst skipedDevs = flow.get('skipedDevs')\nconst values = global.get('values')\n\nconst package = []\n\n\ndevices.forEach(( el )=>{\n\n    const id = el.ModbusID\n    const title = el.Name\n    const screen = el.Screen\n    const value = values[id]?.value || null\n\n    if (!screen) return\n\n    let status = 'ok'\n\n    if (!el.IsRequested) status = 'disabled'\n    else if (skipedDevs.has(id)) status = 'error'\n\n    package.push({ id, title, screen, status, value })   \n\n});\n\nmsg.payload = package\n\nif (package.length) return msg;\n",
+        "func": "const devices = global.get('devices') || []\nconst skipedDevs = flow.get('skipedDevs')\nconst values = global.get('values')\n\nconst package = []\n\n\ndevices.forEach(( el )=>{\n\n    const id = el.ModbusID\n    const title = el.Name\n    const screen = el.Screen\n    const value = values[id]?.value || null\n    const performance = values[id]?.performance || null\n\n    if (!screen) return\n\n    let status = 'ok'\n\n    if (!el.IsRequested) status = 'disabled'\n    else if (skipedDevs.has(id)) status = 'error'\n\n    package.push({ id, title, screen, status, value, performance})   \n\n});\n\nmsg.payload = package\n\nif (package.length) return msg;\n",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
@@ -647,7 +647,7 @@
         "type": "debug",
         "z": "6e52c1301b78909b",
         "name": "debug 1",
-        "active": true,
+        "active": false,
         "tosidebar": true,
         "console": false,
         "tostatus": false,
@@ -655,7 +655,7 @@
         "targetType": "msg",
         "statusVal": "",
         "statusType": "auto",
-        "x": 720,
+        "x": 740,
         "y": 1040,
         "wires": []
     },
