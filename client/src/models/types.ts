@@ -8,3 +8,12 @@ export type DeviceData = {
   value: number | null
   performance: number | null
 }
+
+export type DeviceConfig = {
+  ModbusID: number
+  Name: string
+  IsRequested: boolean
+  ValueRegAdr: number
+  ResetRegAdr: number
+  Screen: number
+}
