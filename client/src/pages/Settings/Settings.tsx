@@ -1,5 +1,5 @@
 import { FC } from 'react'
-import Devices from '@/pages/Settings/components/Devices'
+import Devices from '@/modules/Devices'
 
 const Settings: FC = () => {
   return (

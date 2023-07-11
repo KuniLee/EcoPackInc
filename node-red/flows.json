@@ -70,7 +70,6 @@
         "id": "608ff9c050d10945",
         "type": "MySQLdatabase",
         "name": "mysql-db",
-        "host": "127.0.0.1",
         "port": "3306",
         "db": "DataBase",
         "tz": "",
