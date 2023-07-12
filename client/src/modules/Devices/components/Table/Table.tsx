@@ -29,6 +29,13 @@ const Table: FC<TableProps> = ({ devices }) => {
                 </tr>
               </thead>
               <tbody className="bg-neutral-50">
+                {!devices.length && (
+                  <tr>
+                    <td colSpan={4} className="whitespace-nowrap px-6 py-2">
+                      Нет устройств
+                    </td>
+                  </tr>
+                )}
                 {devices.map((el) => (
                   <tr key={el.ModbusID} className="border-b dark:border-neutral-500 cursor-pointer">
                     <td className="whitespace-nowrap border-r px-6 py-2 font-medium">{el.ModbusID}</td>

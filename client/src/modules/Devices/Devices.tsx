@@ -1,11 +1,14 @@
-import { FC, useEffect } from 'react'
+import { FC, useEffect, useState } from 'react'
 import { observer } from 'mobx-react-lite'
 import { useStore } from '@/store'
 import Table from '@/modules/Devices/components/Table'
 import Button from '@/UI/Button'
 import Spinner from '@/UI/Spinner'
+import ModalWindow from '@components/ModalWindow/ModalWindow'
 
 const Devices: FC = observer(() => {
+  const [showModal, setShowModal] = useState(true)
+
   const {
     devicesStore: { devices, loading, loadDevices },
   } = useStore()
@@ -25,6 +28,7 @@ const Devices: FC = observer(() => {
           <Table devices={devices} />
         </>
       )}
+      <ModalWindow title={'Добавить устройство'} showModal={showModal} setShowModal={setShowModal} />
     </>
   )
 })
