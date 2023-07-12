@@ -6,17 +6,36 @@ import Button from '@/UI/Button'
 import Spinner from '@/UI/Spinner'
 import ModalWindow from '@components/ModalWindow/ModalWindow'
 import DeviceForm from '@/modules/Devices/components/DeviceForm/DeviceForm'
+import { DeviceConfig } from '@/models/types'
 
 const Devices: FC = observer(() => {
-  const [showModal, setShowModal] = useState(true)
+  const [showModal, setShowModal] = useState(false)
+  const [errorMsg, setErrorMsg] = useState<string | null>(null)
 
   const {
-    devicesStore: { devices, loading, loadDevices },
+    devicesStore: { devices, loading, loadDevices, makeDevice },
   } = useStore()
 
   useEffect(() => {
     loadDevices()
   }, [loadDevices])
+
+  function showMsg(msg: string) {
+    setErrorMsg(msg)
+    setTimeout(() => {
+      setErrorMsg(null)
+    }, 3000)
+  }
+
+  const createDevice = async (device: DeviceConfig) => {
+    if (devices.find((el) => el.ModbusID == device.ModbusID)) {
+      showMsg('Такой ID уже существует')
+
+      return
+    }
+    await makeDevice(device)
+    setShowModal(false)
+  }
 
   return (
     <>
@@ -25,12 +44,14 @@ const Devices: FC = observer(() => {
         <Spinner />
       ) : (
         <>
-          <Button className="my-2">Добавить устройство</Button>
+          <Button className="my-2" onClick={() => setShowModal(true)}>
+            Добавить устройство
+          </Button>
           <Table devices={devices} />
         </>
       )}
       <ModalWindow title="Добавить устройство" showModal={showModal} setShowModal={setShowModal}>
-        <DeviceForm />
+        <DeviceForm msg={errorMsg} onSubmit={createDevice} />
       </ModalWindow>
     </>
   )

@@ -3,12 +3,15 @@ import { useForm } from 'react-hook-form'
 import { DeviceConfig } from '@/models/types'
 import { TEInput } from 'tw-elements-react'
 import Button from '@/UI/Button'
+import Alert from '@/UI/Alert'
 
 type DeviceFormProp = {
   defaultValue?: DeviceConfig
+  onSubmit: (data: DeviceConfig) => void
+  msg: string | null
 }
 
-const DeviceForm: FC<DeviceFormProp> = ({ defaultValue }) => {
+const DeviceForm: FC<DeviceFormProp> = ({ defaultValue, onSubmit: onSubmitFunc, msg }) => {
   const {
     register,
     formState: { errors },
@@ -17,14 +20,7 @@ const DeviceForm: FC<DeviceFormProp> = ({ defaultValue }) => {
     defaultValues: { ...defaultValue, ResetRegAdr: 1, ValueRegAdr: 1001 },
   })
 
-  const onSubmit = handleSubmit(
-    (data) => {
-      console.log(data)
-    },
-    (data) => {
-      console.log(data)
-    }
-  )
+  const onSubmit = handleSubmit(onSubmitFunc)
 
   return (
     <>
@@ -96,6 +92,7 @@ const DeviceForm: FC<DeviceFormProp> = ({ defaultValue }) => {
             Опрос
           </label>
         </div>
+        {msg && <Alert>{msg}</Alert>}
         <Button className="mt-2 self-end" type="submit">
           Сохранить
         </Button>

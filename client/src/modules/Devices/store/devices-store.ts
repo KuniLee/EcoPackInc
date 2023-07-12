@@ -1,6 +1,6 @@
 import { makeAutoObservable, runInAction } from 'mobx'
 import { DeviceConfig } from '@/models/types'
-import { getDevices } from '@/modules/Devices/API/devices'
+import { createDevice, getDevices } from '@/modules/Devices/API/devices'
 
 class DevicesStore {
   devices: DeviceConfig[] = []
@@ -20,6 +20,18 @@ class DevicesStore {
       runInAction(() => {
         this.devices = devices
         this.loading = false
+      })
+    } catch (e) {
+      console.error(e)
+    }
+  }
+
+  makeDevice = async (data: DeviceConfig) => {
+    try {
+      const newDevice = await createDevice(data)
+
+      runInAction(() => {
+        this.devices.push(newDevice)
       })
     } catch (e) {
       console.error(e)
