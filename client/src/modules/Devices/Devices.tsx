@@ -5,6 +5,7 @@ import Table from '@/modules/Devices/components/Table'
 import Button from '@/UI/Button'
 import Spinner from '@/UI/Spinner'
 import ModalWindow from '@components/ModalWindow/ModalWindow'
+import DeviceForm from '@/modules/Devices/components/DeviceForm/DeviceForm'
 
 const Devices: FC = observer(() => {
   const [showModal, setShowModal] = useState(true)
@@ -28,7 +29,9 @@ const Devices: FC = observer(() => {
           <Table devices={devices} />
         </>
       )}
-      <ModalWindow title={'Добавить устройство'} showModal={showModal} setShowModal={setShowModal} />
+      <ModalWindow title="Добавить устройство" showModal={showModal} setShowModal={setShowModal}>
+        <DeviceForm />
+      </ModalWindow>
     </>
   )
 })
