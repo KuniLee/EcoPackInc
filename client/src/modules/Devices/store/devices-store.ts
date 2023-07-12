@@ -4,7 +4,7 @@ import { getDevices } from '@/modules/Devices/API/devices'
 
 class DevicesStore {
   devices: DeviceConfig[] = []
-  loading = false
+  loading = true
 
   constructor() {
     makeAutoObservable(this)

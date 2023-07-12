@@ -1,6 +1,9 @@
 import { FC, useEffect } from 'react'
 import { observer } from 'mobx-react-lite'
 import { useStore } from '@/store'
+import Table from '@/modules/Devices/components/Table'
+import Button from '@/UI/Button'
+import Spinner from '@/UI/Spinner'
 
 const Devices: FC = observer(() => {
   const {
@@ -13,8 +16,15 @@ const Devices: FC = observer(() => {
 
   return (
     <>
-      <h1 className="text-xl">Modbus устройства</h1>
-      {loading ? <p>Загрузка</p> : <p>{JSON.stringify(devices)}</p>}
+      <h1 className="text-xl mb-2">Modbus устройства</h1>
+      {loading ? (
+        <Spinner />
+      ) : (
+        <>
+          <Button className="my-2">Добавить устройство</Button>
+          <Table devices={devices} />
+        </>
+      )}
     </>
   )
 })
