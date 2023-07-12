@@ -1,4 +1,4 @@
-import { makeAutoObservable } from 'mobx'
+import { makeAutoObservable, runInAction } from 'mobx'
 import { DeviceConfig } from '@/models/types'
 import { getDevices } from '@/modules/Devices/API/devices'
 
@@ -12,9 +12,15 @@ class DevicesStore {
 
   loadDevices = async () => {
     try {
-      this.loading = true
-      this.devices = await getDevices()
-      this.loading = false
+      runInAction(() => {
+        this.loading = true
+      })
+      const devices = await getDevices()
+
+      runInAction(() => {
+        this.devices = devices
+        this.loading = false
+      })
     } catch (e) {
       console.error(e)
     }

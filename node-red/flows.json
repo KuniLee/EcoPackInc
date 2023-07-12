@@ -40,54 +40,6 @@
         "env": []
     },
     {
-        "id": "b8dd5dc2.87841",
-        "type": "modbus-client",
-        "name": "modbusTCPserver",
-        "clienttype": "tcp",
-        "bufferCommands": true,
-        "stateLogEnabled": false,
-        "queueLogEnabled": false,
-        "failureLogEnabled": false,
-        "tcpHost": "localhost",
-        "tcpPort": "502",
-        "tcpType": "DEFAULT",
-        "serialPort": "/dev/ttyUSB",
-        "serialType": "RTU-BUFFERD",
-        "serialBaudrate": "9600",
-        "serialDatabits": "8",
-        "serialStopbits": "1",
-        "serialParity": "none",
-        "serialConnectionDelay": "100",
-        "serialAsciiResponseStartDelimiter": "",
-        "unit_id": "",
-        "commandDelay": "1",
-        "clientTimeout": "500",
-        "reconnectOnTimeout": true,
-        "reconnectTimeout": "2000",
-        "parallelUnitIdsAllowed": true
-    },
-    {
-        "id": "608ff9c050d10945",
-        "type": "MySQLdatabase",
-        "name": "mysql-db",
-        "port": "3306",
-        "db": "DataBase",
-        "tz": "",
-        "charset": "UTF8"
-    },
-    {
-        "id": "f8eb90804d4934dd",
-        "type": "websocket-listener",
-        "path": "/ws/data",
-        "wholemsg": "false"
-    },
-    {
-        "id": "e0707ccdfb3f12e8",
-        "type": "websocket-listener",
-        "path": "/ws/time",
-        "wholemsg": "false"
-    },
-    {
         "id": "6bd0068ce09f7195",
         "type": "inject",
         "z": "d8f388f98592d062",
@@ -1746,6 +1698,74 @@
             [
                 "0ffb7b2d93f5ec64"
             ]
+        ]
+    },
+    {
+        "id": "b8dd5dc2.87841",
+        "type": "modbus-client",
+        "name": "modbusTCPserver",
+        "clienttype": "tcp",
+        "bufferCommands": true,
+        "stateLogEnabled": false,
+        "queueLogEnabled": false,
+        "failureLogEnabled": false,
+        "tcpHost": "localhost",
+        "tcpPort": "502",
+        "tcpType": "DEFAULT",
+        "serialPort": "/dev/ttyUSB",
+        "serialType": "RTU-BUFFERD",
+        "serialBaudrate": "9600",
+        "serialDatabits": "8",
+        "serialStopbits": "1",
+        "serialParity": "none",
+        "serialConnectionDelay": "100",
+        "serialAsciiResponseStartDelimiter": "",
+        "unit_id": "",
+        "commandDelay": "1",
+        "clientTimeout": "500",
+        "reconnectOnTimeout": true,
+        "reconnectTimeout": "2000",
+        "parallelUnitIdsAllowed": true,
+        "_users": [
+            "301faa842db8fef8",
+            "accc94a8e437d04e",
+            "d794e96c01b3f0d4"
+        ]
+    },
+    {
+        "id": "608ff9c050d10945",
+        "type": "MySQLdatabase",
+        "name": "mysql-db",
+        "port": "3306",
+        "db": "DataBase",
+        "tz": "",
+        "charset": "UTF8",
+        "_users": [
+            "f1a39dbdacbb6d43",
+            "bcf0258362e4a423",
+            "b52cfd3ed1fda7d7",
+            "b043d5e44e6b72db",
+            "b43dd66cf14e1b5c",
+            "1e186cfcf1942757"
+        ],
+        "host": "127.0.0.1"
+    },
+    {
+        "id": "f8eb90804d4934dd",
+        "type": "websocket-listener",
+        "path": "/ws/data",
+        "wholemsg": "false",
+        "_users": [
+            "f1a1f104ea0bff18"
+        ]
+    },
+    {
+        "id": "e0707ccdfb3f12e8",
+        "type": "websocket-listener",
+        "path": "/ws/time",
+        "wholemsg": "false",
+        "_users": [
+            "0ffb7b2d93f5ec64"
         ]
     }
 ]
