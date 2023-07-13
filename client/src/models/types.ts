@@ -17,3 +17,9 @@ export type DeviceConfig = {
   ResetRegAdr: number
   Screen: number
 }
+
+export type Configs = {
+  MODBUS_TCP_IP: string
+  ATTEMPTS: number
+  ERROR_TIME: number
+}

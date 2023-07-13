@@ -1301,10 +1301,10 @@
         "z": "f8267d55bb8665c3",
         "name": "",
         "url": "/api/settings",
-        "method": "patch",
+        "method": "put",
         "upload": false,
         "swaggerDoc": "",
-        "x": 110,
+        "x": 100,
         "y": 840,
         "wires": [
             [
@@ -1366,7 +1366,7 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 940,
+        "x": 900,
         "y": 900,
         "wires": [
             [
