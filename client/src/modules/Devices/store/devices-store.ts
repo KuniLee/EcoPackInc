@@ -1,6 +1,6 @@
 import { makeAutoObservable, runInAction } from 'mobx'
 import { DeviceConfig } from '@/models/types'
-import { createDevice, getDevices } from '@/modules/Devices/API/devices'
+import { createDevice, getDevices, removeDevice, updateDevice } from '@/modules/Devices/API/devices'
 
 class DevicesStore {
   devices: DeviceConfig[] = []
@@ -32,6 +32,31 @@ class DevicesStore {
 
       runInAction(() => {
         this.devices.push(newDevice)
+      })
+    } catch (e) {
+      console.error(e)
+    }
+  }
+
+  deleteDevice = async (id: number) => {
+    try {
+      await removeDevice(id)
+
+      runInAction(() => {
+        this.devices = this.devices.filter((el) => el.ModbusID !== id)
+      })
+    } catch (e) {
+      console.error(e)
+    }
+  }
+
+  updateDevice = async (id: number, data: DeviceConfig) => {
+    try {
+      const updatedDevice = await updateDevice(id, data)
+
+      runInAction(() => {
+        this.devices = this.devices.filter((el) => el.ModbusID !== id)
+        this.devices.push(updatedDevice)
       })
     } catch (e) {
       console.error(e)

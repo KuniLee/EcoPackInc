@@ -4,8 +4,9 @@ import { AiOutlineCheckCircle, AiOutlineCloseCircle } from 'react-icons/ai'
 
 type TableProps = {
   devices: DeviceConfig[]
+  onClick: (device: DeviceConfig) => void
 }
-const Table: FC<TableProps> = ({ devices }) => {
+const Table: FC<TableProps> = ({ devices, onClick }) => {
   return (
     <div className="flex flex-col text-black">
       <div className="overflow-x-auto sm:-mx-6 lg:-mx-8">
@@ -37,7 +38,10 @@ const Table: FC<TableProps> = ({ devices }) => {
                   </tr>
                 )}
                 {devices.map((el) => (
-                  <tr key={el.ModbusID} className="border-b dark:border-neutral-500 cursor-pointer">
+                  <tr
+                    key={el.ModbusID}
+                    onClick={() => onClick(el)}
+                    className="border-b dark:border-neutral-500 cursor-pointer">
                     <td className="whitespace-nowrap border-r px-6 py-2 font-medium">{el.ModbusID}</td>
                     <td className="whitespace-nowrap border-r px-6 py-2">{el.Name}</td>
                     <td className="whitespace-nowrap border-r px-6 py-1">

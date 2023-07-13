@@ -10,10 +10,12 @@ import { DeviceConfig } from '@/models/types'
 
 const Devices: FC = observer(() => {
   const [showModal, setShowModal] = useState(false)
+  const [showModal2, setShowModal2] = useState(false)
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
+  const [openedDevice, setOpenedDevice] = useState<DeviceConfig>()
 
   const {
-    devicesStore: { devices, loading, loadDevices, makeDevice },
+    devicesStore: { devices, loading, loadDevices, makeDevice, deleteDevice, updateDevice },
   } = useStore()
 
   useEffect(() => {
@@ -37,6 +39,29 @@ const Devices: FC = observer(() => {
     setShowModal(false)
   }
 
+  const changeDevice = async (device: DeviceConfig) => {
+    const openedId = openedDevice?.ModbusID
+
+    if (openedId !== device.ModbusID && devices.find((el) => el.ModbusID == device.ModbusID)) {
+      showMsg('Такой ID уже существует')
+
+      return
+    }
+
+    await updateDevice(openedDevice?.ModbusID || 0, device)
+    setShowModal2(false)
+  }
+
+  const removeDevice = async (id: number) => {
+    await deleteDevice(id)
+    setShowModal2(false)
+  }
+
+  const openDevice = (device: DeviceConfig) => {
+    setOpenedDevice(device)
+    setShowModal2(true)
+  }
+
   return (
     <>
       <h1 className="text-xl mb-2">Modbus устройства</h1>
@@ -47,11 +72,14 @@ const Devices: FC = observer(() => {
           <Button className="my-2" onClick={() => setShowModal(true)}>
             Добавить устройство
           </Button>
-          <Table devices={devices} />
+          <Table onClick={openDevice} devices={devices} />
         </>
       )}
       <ModalWindow title="Добавить устройство" showModal={showModal} setShowModal={setShowModal}>
         <DeviceForm msg={errorMsg} onSubmit={createDevice} />
+      </ModalWindow>
+      <ModalWindow title="Изменить устройство" showModal={showModal2} setShowModal={setShowModal2}>
+        <DeviceForm msg={errorMsg} onDelete={removeDevice} onSubmit={changeDevice} defaultValue={openedDevice} />
       </ModalWindow>
     </>
   )
