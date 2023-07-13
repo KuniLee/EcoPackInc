@@ -18,7 +18,7 @@ class DevicesStore {
       const devices = await getDevices()
 
       runInAction(() => {
-        this.devices = devices
+        this.devices = devices.sort((a, b) => a.ModbusID - b.ModbusID)
         this.loading = false
       })
     } catch (e) {
@@ -32,6 +32,7 @@ class DevicesStore {
 
       runInAction(() => {
         this.devices.push(newDevice)
+        this.devices = this.devices.sort((a, b) => a.ModbusID - b.ModbusID)
       })
     } catch (e) {
       console.error(e)
@@ -44,6 +45,7 @@ class DevicesStore {
 
       runInAction(() => {
         this.devices = this.devices.filter((el) => el.ModbusID !== id)
+        this.devices = this.devices.sort((a, b) => a.ModbusID - b.ModbusID)
       })
     } catch (e) {
       console.error(e)
@@ -57,6 +59,7 @@ class DevicesStore {
       runInAction(() => {
         this.devices = this.devices.filter((el) => el.ModbusID !== id)
         this.devices.push(updatedDevice)
+        this.devices = this.devices.sort((a, b) => a.ModbusID - b.ModbusID)
       })
     } catch (e) {
       console.error(e)
