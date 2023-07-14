@@ -9,7 +9,7 @@ type ConfigInputProps = {
   field: keyof Configs
   label: string
   validateOptions: RegisterOptions
-  type: 'number' | 'text'
+  type: 'number' | 'text' | 'time'
 }
 export const ConfigInput: FC<ConfigInputProps> = ({ field, label, validateOptions, type }) => {
   const {
@@ -31,7 +31,7 @@ export const ConfigInput: FC<ConfigInputProps> = ({ field, label, validateOption
   })
 
   return (
-    <form className="relative mb-8 flex gap-1 [&>div]:flex-grow" onSubmit={onSubmit}>
+    <form className="relative mb-8 flex gap-1 " onSubmit={onSubmit}>
       <TEInput type={type} id={field} label={label} {...register(field, validateOptions)}>
         <small id="modbusIpError" className="absolute w-full text-danger-700 dark:text-neutral-200">
           {

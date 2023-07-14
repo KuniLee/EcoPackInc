@@ -60,10 +60,10 @@
         "serialConnectionDelay": "100",
         "serialAsciiResponseStartDelimiter": "",
         "unit_id": "",
-        "commandDelay": "1",
-        "clientTimeout": "500",
+        "commandDelay": 1,
+        "clientTimeout": 500,
         "reconnectOnTimeout": true,
-        "reconnectTimeout": "2000",
+        "reconnectTimeout": 2000,
         "parallelUnitIdsAllowed": true
     },
     {
@@ -118,7 +118,7 @@
         "type": "function",
         "z": "d8f388f98592d062",
         "name": "Инициализация Global",
-        "func": "global.get('MODBUS_TCP_IP', 'file') || global.set('MODBUS_TCP_IP', '127.0.0.1', 'file')\nglobal.get('ATTEMPTS', 'file') || global.set('ATTEMPTS', 3, 'file')\nglobal.get('ERROR_TIME', 'file') || global.set('ERROR_TIME', 10000, 'file')",
+        "func": "global.get('MODBUS_TCP_IP', 'file') || global.set('MODBUS_TCP_IP', '127.0.0.1', 'file')\nglobal.get('ATTEMPTS', 'file') || global.set('ATTEMPTS', 3, 'file')\nglobal.get('ERROR_TIME', 'file') || global.set('ERROR_TIME', 10000, 'file')\nglobal.get('STAGE_TIME', 'file') || global.set('STAGE_TIME', ['09:00','21:00'], 'file')",
         "outputs": 0,
         "noerr": 0,
         "initialize": "",
@@ -301,7 +301,8 @@
         "wires": [
             [],
             [
-                "5c7d0c636d0abba8"
+                "5c7d0c636d0abba8",
+                "8ccaebc5b66802d0"
             ]
         ]
     },
@@ -621,14 +622,14 @@
         "type": "function",
         "z": "6e52c1301b78909b",
         "name": "Исключить из пропущенных",
-        "func": "node.warn(msg)\n\nflow.get('skipedDevs').delete(+msg.unitId)",
+        "func": "flow.get('skipedDevs').delete(+msg.unitId)",
         "outputs": 0,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1020,
-        "y": 500,
+        "x": 1000,
+        "y": 460,
         "wires": []
     },
     {
@@ -711,6 +712,23 @@
         "libs": [],
         "x": 560,
         "y": 660,
+        "wires": []
+    },
+    {
+        "id": "8ccaebc5b66802d0",
+        "type": "debug",
+        "z": "6e52c1301b78909b",
+        "name": "debug 2",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 820,
+        "y": 240,
         "wires": []
     },
     {
@@ -925,7 +943,7 @@
         "name": "",
         "statusCode": "",
         "headers": {},
-        "x": 1130,
+        "x": 1170,
         "y": 340,
         "wires": []
     },
@@ -1362,7 +1380,8 @@
         "y": 840,
         "wires": [
             [
-                "c0cd52030be91ae7"
+                "c0cd52030be91ae7",
+                "82351c110effcc3b"
             ]
         ]
     },
@@ -1511,6 +1530,23 @@
         ],
         "x": 855,
         "y": 960,
+        "wires": []
+    },
+    {
+        "id": "82351c110effcc3b",
+        "type": "debug",
+        "z": "f8267d55bb8665c3",
+        "name": "debug 3",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 380,
+        "y": 1000,
         "wires": []
     },
     {

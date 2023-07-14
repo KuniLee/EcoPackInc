@@ -3,6 +3,7 @@ import { observer } from 'mobx-react-lite'
 import { useStore } from '@/store'
 import Spinner from '@/UI/Spinner'
 import { ConfigInput } from '@/modules/Configs/components/ConfigInput'
+import { StageTimeInput } from '@/modules/Configs/components/StageTimeInput'
 
 const Configs: FC = observer(() => {
   const {
@@ -44,6 +45,7 @@ const Configs: FC = observer(() => {
             }}
             type="number"
           />
+          <StageTimeInput />
         </>
       )}
     </>
