@@ -8,6 +8,8 @@ type CardProps = {
 }
 
 const Card: FC<CardProps> = ({ data: { status, title, value, performance } }) => {
+  console.log(performance)
+
   return (
     <div className="@container">
       <div
@@ -25,11 +27,11 @@ const Card: FC<CardProps> = ({ data: { status, title, value, performance } }) =>
         <div className="flex flex-col">
           <span className="mb-2 leading-none text-[0.75em]">Значение: </span>
           <span className="mb-6 leading-none @[900px]:text-[4em] @[400px]:text-[3em] text-[3.2em] self-center">
-            {value || '----'}
+            {value === null || value === undefined ? '----' : value}
           </span>
           <span className="mb-2 leading-none text-[0.75em]">Производительность (шт/мин):</span>
           <span className="text-[3.2em] leading-none @[900px]:text-[4em] @[400px]:text-[3em] self-center">
-            {performance || '----'}
+            {performance === null || performance === undefined ? '----' : performance}
           </span>
         </div>
       </div>

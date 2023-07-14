@@ -44,10 +44,10 @@
 				<WorkType>2</WorkType>
 				<DataFormat>4</DataFormat>
 				<Percent>0</Percent>
-				<Period>100</Period>
+				<Period>10</Period>
 				<RegFullName>Сервер.Счётчик.Value</RegFullName>
 				<RegsCount>2</RegsCount>
-				<Value>49</Value>
+				<Value>983</Value>
 				<DefValue>0</DefValue>
 			</Register>
 			<Register>
@@ -113,7 +113,7 @@
 				<Period>100</Period>
 				<RegFullName>Сервер.Счётчик.Start</RegFullName>
 				<RegsCount>0</RegsCount>
-				<Value>true</Value>
+				<Value>false</Value>
 				<DefValue>true</DefValue>
 			</Register>
 			<Register>
@@ -133,380 +133,8 @@
 				<Period>100</Period>
 				<RegFullName>Сервер.Счётчик.Speed</RegFullName>
 				<RegsCount>2</RegsCount>
-				<Value>80</Value>
-				<DefValue>80</DefValue>
-			</Register>
-			<Register>
-				<Name>FloatValue</Name>
-				<Addr>2002</Addr>
-				<BitAddr>0</BitAddr>
-				<vType>4</vType>
-				<Description>
-				</Description>
-				<mSpace>0</mSpace>
-				<ConstGroupName>
-				</ConstGroupName>
-				<Group>
-				</Group>
-				<Script>
-					<Line>//Скрипт на исполнение</Line>
-					<Line>var</Line>
-					<Line>inc: Single;</Line>
-					<Line>begin</Line>
-					<Line>inc:= Speed / 600;</Line>
-					<Line>if Start then</Line>
-					<Line>   begin</Line>
-					<Line>   self:= self + inc;</Line>
-					<Line>   if self&gt;999999 then self:=0;</Line>
-					<Line>   Value:= Trunc(self);</Line>
-					<Line>   end</Line>
-					<Line>end;</Line>
-				</Script>
-				<ScriptStart>
-					<Line>//Скрипт на запуск</Line>
-					<Line>begin</Line>
-					<Line>end;</Line>
-				</ScriptStart>
-				<ScriptStop>
-					<Line>//Скрипт на останов</Line>
-					<Line>begin</Line>
-					<Line>end;</Line>
-				</ScriptStop>
-				<RegVals>
-					<RegVal>
-						<RegFullName>Сервер.Счётчик.Start</RegFullName>
-						<ValName>Start</ValName>
-					</RegVal>
-					<RegVal>
-						<RegFullName>Сервер.Счётчик.Value</RegFullName>
-						<ValName>Value</ValName>
-					</RegVal>
-					<RegVal>
-						<RegFullName>Сервер.Счётчик.Speed</RegFullName>
-						<ValName>Speed</ValName>
-					</RegVal>
-				</RegVals>
-				<WorkType>5</WorkType>
-				<DataFormat>4</DataFormat>
-				<Percent>0</Percent>
-				<Period>100</Period>
-				<RegFullName>Сервер.Счётчик.FloatValue</RegFullName>
-				<RegsCount>2</RegsCount>
-				<Value>49.0668678283691</Value>
-				<DefValue>0</DefValue>
-			</Register>
-		</Device>
-		<Device>
-			<Name>Счётчик1</Name>
-			<Number>10</Number>
-			<Description>
-			</Description>
-			<NoReply>false</NoReply>
-			<ReplyTimeout>0</ReplyTimeout>
-			<ReplyTimeoutTo>0</ReplyTimeoutTo>
-			<BitsMerge>false</BitsMerge>
-			<RegsMerge>false</RegsMerge>
-			<ProgID>
-			</ProgID>
-			<EnabelRepeat>false</EnabelRepeat>
-			<SendTrash>false</SendTrash>
-			<InvalidLength>false</InvalidLength>
-			<Groups>
-				<Items>
-					<Name>MainGroup</Name>
-				</Items>
-			</Groups>
-			<Register>
-				<Name>Value</Name>
-				<Addr>1001</Addr>
-				<BitAddr>0</BitAddr>
-				<vType>3</vType>
-				<Description>Текущее значение</Description>
-				<mSpace>1</mSpace>
-				<ConstGroupName>
-				</ConstGroupName>
-				<Group>
-				</Group>
-				<WorkType>2</WorkType>
-				<DataFormat>4</DataFormat>
-				<Percent>0</Percent>
-				<Period>100</Period>
-				<RegFullName>Сервер.Счётчик1.Value</RegFullName>
-				<RegsCount>2</RegsCount>
-				<Value>49</Value>
-				<DefValue>0</DefValue>
-			</Register>
-			<Register>
-				<Name>Reset</Name>
-				<Addr>1</Addr>
-				<BitAddr>0</BitAddr>
-				<vType>11</vType>
-				<Description>Сброс</Description>
-				<mSpace>2</mSpace>
-				<ConstGroupName>
-				</ConstGroupName>
-				<Group>
-				</Group>
-				<Script>
-					<Line>//Скрипт на исполнение</Line>
-					<Line>begin</Line>
-					<Line>     If self=true then</Line>
-					<Line>        begin</Line>
-					<Line>        FloatValue:=0;</Line>
-					<Line>        self:=false;</Line>
-					<Line>        end</Line>
-					<Line>end;</Line>
-				</Script>
-				<ScriptStart>
-					<Line>//Скрипт на запуск</Line>
-					<Line>begin</Line>
-					<Line>end;</Line>
-				</ScriptStart>
-				<ScriptStop>
-					<Line>//Скрипт на останов</Line>
-					<Line>begin</Line>
-					<Line>end;</Line>
-				</ScriptStop>
-				<RegVals>
-					<RegVal>
-						<RegFullName>Сервер.Счётчик1.FloatValue</RegFullName>
-						<ValName>FloatValue</ValName>
-					</RegVal>
-				</RegVals>
-				<WorkType>5</WorkType>
-				<DataFormat>2</DataFormat>
-				<Percent>0</Percent>
-				<Period>100</Period>
-				<RegFullName>Сервер.Счётчик1.Reset</RegFullName>
-				<RegsCount>0</RegsCount>
-				<Value>false</Value>
-				<DefValue>false</DefValue>
-			</Register>
-			<Register>
-				<Name>Start</Name>
-				<Addr>100</Addr>
-				<BitAddr>0</BitAddr>
-				<vType>11</vType>
-				<Description>
-				</Description>
-				<mSpace>2</mSpace>
-				<ConstGroupName>status</ConstGroupName>
-				<Group>
-				</Group>
-				<WorkType>2</WorkType>
-				<DataFormat>2</DataFormat>
-				<Percent>0</Percent>
-				<Period>100</Period>
-				<RegFullName>Сервер.Счётчик1.Start</RegFullName>
-				<RegsCount>0</RegsCount>
-				<Value>true</Value>
-				<DefValue>true</DefValue>
-			</Register>
-			<Register>
-				<Name>Speed</Name>
-				<Addr>2000</Addr>
-				<BitAddr>0</BitAddr>
-				<vType>3</vType>
-				<Description>Скорость коробочек/мин</Description>
-				<mSpace>1</mSpace>
-				<ConstGroupName>
-				</ConstGroupName>
-				<Group>
-				</Group>
-				<WorkType>2</WorkType>
-				<DataFormat>4</DataFormat>
-				<Percent>0</Percent>
-				<Period>100</Period>
-				<RegFullName>Сервер.Счётчик1.Speed</RegFullName>
-				<RegsCount>2</RegsCount>
-				<Value>80</Value>
-				<DefValue>80</DefValue>
-			</Register>
-			<Register>
-				<Name>FloatValue</Name>
-				<Addr>2002</Addr>
-				<BitAddr>0</BitAddr>
-				<vType>4</vType>
-				<Description>
-				</Description>
-				<mSpace>0</mSpace>
-				<ConstGroupName>
-				</ConstGroupName>
-				<Group>
-				</Group>
-				<Script>
-					<Line>//Скрипт на исполнение</Line>
-					<Line>var</Line>
-					<Line>inc: Single;</Line>
-					<Line>begin</Line>
-					<Line>inc:= Speed / 600;</Line>
-					<Line>if Start then</Line>
-					<Line>   begin</Line>
-					<Line>   self:= self + inc;</Line>
-					<Line>   if self&gt;999999 then self:=0;</Line>
-					<Line>   Value:= Trunc(self);</Line>
-					<Line>   end</Line>
-					<Line>end;</Line>
-				</Script>
-				<ScriptStart>
-					<Line>//Скрипт на запуск</Line>
-					<Line>begin</Line>
-					<Line>end;</Line>
-				</ScriptStart>
-				<ScriptStop>
-					<Line>//Скрипт на останов</Line>
-					<Line>begin</Line>
-					<Line>end;</Line>
-				</ScriptStop>
-				<RegVals>
-					<RegVal>
-						<RegFullName>Сервер.Счётчик1.Start</RegFullName>
-						<ValName>Start</ValName>
-					</RegVal>
-					<RegVal>
-						<RegFullName>Сервер.Счётчик1.Value</RegFullName>
-						<ValName>Value</ValName>
-					</RegVal>
-					<RegVal>
-						<RegFullName>Сервер.Счётчик1.Speed</RegFullName>
-						<ValName>Speed</ValName>
-					</RegVal>
-				</RegVals>
-				<WorkType>5</WorkType>
-				<DataFormat>4</DataFormat>
-				<Percent>0</Percent>
-				<Period>100</Period>
-				<RegFullName>Сервер.Счётчик1.FloatValue</RegFullName>
-				<RegsCount>2</RegsCount>
-				<Value>49.0668678283691</Value>
-				<DefValue>0</DefValue>
-			</Register>
-		</Device>
-		<Device>
-			<Name>Счётчик2</Name>
-			<Number>2</Number>
-			<Description>
-			</Description>
-			<NoReply>false</NoReply>
-			<ReplyTimeout>0</ReplyTimeout>
-			<ReplyTimeoutTo>0</ReplyTimeoutTo>
-			<BitsMerge>false</BitsMerge>
-			<RegsMerge>false</RegsMerge>
-			<ProgID>
-			</ProgID>
-			<EnabelRepeat>false</EnabelRepeat>
-			<SendTrash>false</SendTrash>
-			<InvalidLength>false</InvalidLength>
-			<Groups>
-				<Items>
-					<Name>MainGroup</Name>
-				</Items>
-			</Groups>
-			<Register>
-				<Name>Value</Name>
-				<Addr>1001</Addr>
-				<BitAddr>0</BitAddr>
-				<vType>3</vType>
-				<Description>Текущее значение</Description>
-				<mSpace>1</mSpace>
-				<ConstGroupName>
-				</ConstGroupName>
-				<Group>
-				</Group>
-				<WorkType>2</WorkType>
-				<DataFormat>4</DataFormat>
-				<Percent>0</Percent>
-				<Period>100</Period>
-				<RegFullName>Сервер.Счётчик2.Value</RegFullName>
-				<RegsCount>2</RegsCount>
-				<Value>49</Value>
-				<DefValue>0</DefValue>
-			</Register>
-			<Register>
-				<Name>Reset</Name>
-				<Addr>1</Addr>
-				<BitAddr>0</BitAddr>
-				<vType>11</vType>
-				<Description>Сброс</Description>
-				<mSpace>2</mSpace>
-				<ConstGroupName>
-				</ConstGroupName>
-				<Group>
-				</Group>
-				<Script>
-					<Line>//Скрипт на исполнение</Line>
-					<Line>begin</Line>
-					<Line>     If self=true then</Line>
-					<Line>        begin</Line>
-					<Line>        FloatValue:=0;</Line>
-					<Line>        self:=false;</Line>
-					<Line>        end</Line>
-					<Line>end;</Line>
-				</Script>
-				<ScriptStart>
-					<Line>//Скрипт на запуск</Line>
-					<Line>begin</Line>
-					<Line>end;</Line>
-				</ScriptStart>
-				<ScriptStop>
-					<Line>//Скрипт на останов</Line>
-					<Line>begin</Line>
-					<Line>end;</Line>
-				</ScriptStop>
-				<RegVals>
-					<RegVal>
-						<RegFullName>Сервер.Счётчик2.FloatValue</RegFullName>
-						<ValName>FloatValue</ValName>
-					</RegVal>
-				</RegVals>
-				<WorkType>5</WorkType>
-				<DataFormat>2</DataFormat>
-				<Percent>0</Percent>
-				<Period>100</Period>
-				<RegFullName>Сервер.Счётчик2.Reset</RegFullName>
-				<RegsCount>0</RegsCount>
-				<Value>false</Value>
-				<DefValue>false</DefValue>
-			</Register>
-			<Register>
-				<Name>Start</Name>
-				<Addr>100</Addr>
-				<BitAddr>0</BitAddr>
-				<vType>11</vType>
-				<Description>
-				</Description>
-				<mSpace>2</mSpace>
-				<ConstGroupName>status</ConstGroupName>
-				<Group>
-				</Group>
-				<WorkType>2</WorkType>
-				<DataFormat>2</DataFormat>
-				<Percent>0</Percent>
-				<Period>100</Period>
-				<RegFullName>Сервер.Счётчик2.Start</RegFullName>
-				<RegsCount>0</RegsCount>
-				<Value>true</Value>
-				<DefValue>true</DefValue>
-			</Register>
-			<Register>
-				<Name>Speed</Name>
-				<Addr>2000</Addr>
-				<BitAddr>0</BitAddr>
-				<vType>3</vType>
-				<Description>Скорость коробочек/мин</Description>
-				<mSpace>1</mSpace>
-				<ConstGroupName>
-				</ConstGroupName>
-				<Group>
-				</Group>
-				<WorkType>2</WorkType>
-				<DataFormat>4</DataFormat>
-				<Percent>0</Percent>
-				<Period>100</Period>
-				<RegFullName>Сервер.Счётчик2.Speed</RegFullName>
-				<RegsCount>2</RegsCount>
-				<Value>80</Value>
-				<DefValue>80</DefValue>
+				<Value>1000</Value>
+				<DefValue>60</DefValue>
 			</Register>
 			<Register>
 				<Name>FloatValue</Name>
@@ -546,15 +174,15 @@
 				</ScriptStop>
 				<RegVals>
 					<RegVal>
-						<RegFullName>Сервер.Счётчик2.Start</RegFullName>
+						<RegFullName>Сервер.Счётчик.Start</RegFullName>
 						<ValName>Start</ValName>
 					</RegVal>
 					<RegVal>
-						<RegFullName>Сервер.Счётчик2.Value</RegFullName>
+						<RegFullName>Сервер.Счётчик.Value</RegFullName>
 						<ValName>Value</ValName>
 					</RegVal>
 					<RegVal>
-						<RegFullName>Сервер.Счётчик2.Speed</RegFullName>
+						<RegFullName>Сервер.Счётчик.Speed</RegFullName>
 						<ValName>Speed</ValName>
 					</RegVal>
 				</RegVals>
@@ -562,9 +190,9 @@
 				<DataFormat>4</DataFormat>
 				<Percent>0</Percent>
 				<Period>1000</Period>
-				<RegFullName>Сервер.Счётчик2.FloatValue</RegFullName>
+				<RegFullName>Сервер.Счётчик.FloatValue</RegFullName>
 				<RegsCount>2</RegsCount>
-				<Value>49.0668678283691</Value>
+				<Value>983.333801269531</Value>
 				<DefValue>0</DefValue>
 			</Register>
 		</Device>
