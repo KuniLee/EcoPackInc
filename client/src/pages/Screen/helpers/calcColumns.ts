@@ -10,4 +10,5 @@ export default function (n: number) {
   if (n >= 13 && n <= 15) return 'grid-cols-[repeat(5,minmax(100px,15%))]'
   if (n >= 16 && n <= 18) return 'grid-cols-[repeat(6,minmax(100px,17%))]'
   if (n >= 19 && n <= 21) return 'grid-cols-[repeat(7,minmax(100px,15%))]'
+  else return 'grid-cols-[repeat(8,minmax(100px,15%))]'
 }

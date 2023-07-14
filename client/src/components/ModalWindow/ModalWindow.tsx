@@ -9,7 +9,7 @@ type ModalWindowProps = PropsWithChildren & {
 
 const ModalWindow: FC<ModalWindowProps> = ({ showModal, setShowModal, children, title }) => {
   return (
-    <TEModal show={showModal} setShow={setShowModal}>
+    <TEModal show={showModal} staticBackdrop={true} setShow={setShowModal}>
       <TEModalDialog>
         <TEModalContent>
           <TEModalHeader>
