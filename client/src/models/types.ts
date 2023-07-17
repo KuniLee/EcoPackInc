@@ -22,5 +22,5 @@ export type Configs = {
   MODBUS_TCP_IP: string
   ATTEMPTS: number
   ERROR_TIME: number
-  STAGE_TIME: [string, string]
+  STAGE_TIME: [string, string, 'A' | 'B' | 'C' | 'D']
 }

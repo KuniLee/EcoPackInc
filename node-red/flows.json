@@ -118,7 +118,7 @@
         "type": "function",
         "z": "d8f388f98592d062",
         "name": "Инициализация Global",
-        "func": "global.get('MODBUS_TCP_IP', 'file') || global.set('MODBUS_TCP_IP', '127.0.0.1', 'file')\nglobal.get('ATTEMPTS', 'file') || global.set('ATTEMPTS', 3, 'file')\nglobal.get('ERROR_TIME', 'file') || global.set('ERROR_TIME', 10000, 'file')\nglobal.get('STAGE_TIME', 'file') || global.set('STAGE_TIME', ['09:00','21:00'], 'file')",
+        "func": "global.get('MODBUS_TCP_IP', 'file') || global.set('MODBUS_TCP_IP', '127.0.0.1', 'file')\nglobal.get('ATTEMPTS', 'file') || global.set('ATTEMPTS', 3, 'file')\nglobal.get('ERROR_TIME', 'file') || global.set('ERROR_TIME', 10000, 'file')\nglobal.get('STAGE_TIME', 'file') || global.set('STAGE_TIME', ['09:00','21:00','A'], 'file')",
         "outputs": 0,
         "noerr": 0,
         "initialize": "",
@@ -628,7 +628,7 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1000,
+        "x": 1020,
         "y": 460,
         "wires": []
     },
@@ -1506,16 +1506,24 @@
                 "t": "hask",
                 "v": "MODBUS_TCP_IP",
                 "vt": "str"
+            },
+            {
+                "t": "hask",
+                "v": "STAGE_TIME",
+                "vt": "str"
             }
         ],
         "checkall": "true",
         "repair": false,
-        "outputs": 1,
+        "outputs": 2,
         "x": 610,
         "y": 960,
         "wires": [
             [
                 "22e0cbeb7a386cfd"
+            ],
+            [
+                "a2fa98132ae64af3"
             ]
         ]
     },
@@ -1529,7 +1537,7 @@
             "61aced3fbb77aa02"
         ],
         "x": 855,
-        "y": 960,
+        "y": 940,
         "wires": []
     },
     {
@@ -1547,6 +1555,19 @@
         "statusType": "auto",
         "x": 380,
         "y": 1000,
+        "wires": []
+    },
+    {
+        "id": "a2fa98132ae64af3",
+        "type": "link out",
+        "z": "f8267d55bb8665c3",
+        "name": "link out 4",
+        "mode": "link",
+        "links": [
+            "54b5bf7510091755"
+        ],
+        "x": 855,
+        "y": 980,
         "wires": []
     },
     {
@@ -1727,7 +1748,7 @@
         "outputType": "msg",
         "outTz": "Asia/Yekaterinburg",
         "x": 600,
-        "y": 200,
+        "y": 620,
         "wires": [
             [
                 "35b45ec84dcfa0b5"
@@ -1752,7 +1773,7 @@
         "payload": "",
         "payloadType": "date",
         "x": 290,
-        "y": 200,
+        "y": 620,
         "wires": [
             [
                 "df44bd15fd1035b1"
@@ -1767,7 +1788,7 @@
         "server": "e0707ccdfb3f12e8",
         "client": "",
         "x": 1070,
-        "y": 200,
+        "y": 620,
         "wires": []
     },
     {
@@ -1785,39 +1806,14 @@
         "once": true,
         "onceDelay": 0.1,
         "topic": "",
-        "payload": "А",
-        "payloadType": "str",
-        "x": 340,
-        "y": 320,
+        "payload": "",
+        "payloadType": "date",
+        "x": 280,
+        "y": 300,
         "wires": [
             [
-                "42bd0d46e0b9dabb"
+                "7e866656b47d0f09"
             ]
-        ]
-    },
-    {
-        "id": "42bd0d46e0b9dabb",
-        "type": "change",
-        "z": "7e68559fb83a6c0a",
-        "name": "",
-        "rules": [
-            {
-                "t": "set",
-                "p": "stage",
-                "pt": "flow",
-                "to": "payload",
-                "tot": "msg"
-            }
-        ],
-        "action": "",
-        "property": "",
-        "from": "",
-        "to": "",
-        "reg": false,
-        "x": 580,
-        "y": 320,
-        "wires": [
-            []
         ]
     },
     {
@@ -1832,11 +1828,88 @@
         "finalize": "",
         "libs": [],
         "x": 840,
-        "y": 200,
+        "y": 620,
         "wires": [
             [
                 "0ffb7b2d93f5ec64"
             ]
+        ]
+    },
+    {
+        "id": "7e866656b47d0f09",
+        "type": "function",
+        "z": "7e68559fb83a6c0a",
+        "name": "function 5",
+        "func": "const stagesCycle = flow.get('stages')\nconst [time1,time2,stage] = global.get('STAGE_TIME', 'file')\n\nconst currentD = new Date();\nvar startDayStage = new Date();\n// @ts-ignore\nstartDayStage.setHours(...time1.split(':'), 0);\nvar endDayStage = new Date();\n// @ts-ignore\nendDayStage.setHours(...time2.split(':'), 0);\n\nconst isDay = currentD >= startDayStage && currentD < endDayStage\n\nstagesCycle.setStage(stage, isDay)",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "// Добавленный здесь код будет исполняться\n// однократно при развертывании узла.\n\nclass StageCycle {\n    #stages = ['A','B','C','A','D','C','B','D']\n    current = 0\n\n    setStage(stage, isDay){\n       this.current = this.#stages.findIndex((el, idx) => el === stage && idx % 2 !== (+isDay) )\n    }\n    \n    getStage(){\n        return this.#stages[this.current]\n    }\n}\n\nflow.set('stages', new StageCycle())",
+        "finalize": "",
+        "libs": [],
+        "x": 600,
+        "y": 300,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "54b5bf7510091755",
+        "type": "link in",
+        "z": "7e68559fb83a6c0a",
+        "name": "link in 1",
+        "links": [
+            "a2fa98132ae64af3"
+        ],
+        "x": 205,
+        "y": 380,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "923569ae79cca3da",
+        "type": "inject",
+        "z": "7e68559fb83a6c0a",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 320,
+        "y": 520,
+        "wires": [
+            [
+                "e20e5f0e3c3c026b"
+            ]
+        ]
+    },
+    {
+        "id": "e20e5f0e3c3c026b",
+        "type": "function",
+        "z": "7e68559fb83a6c0a",
+        "name": "function 6",
+        "func": "const stagesCycle = flow.get('stages')\n\nnode.warn(stagesCycle.getStage());\n",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 500,
+        "y": 520,
+        "wires": [
+            []
         ]
     }
 ]

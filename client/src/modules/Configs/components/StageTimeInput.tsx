@@ -26,7 +26,7 @@ export const StageTimeInput: FC = () => {
   })
 
   const onSubmit = handleSubmit(({ time1, time2 }) => {
-    saveSetting({ STAGE_TIME: [time1, time2] })
+    saveSetting({ STAGE_TIME: [time1, time2, 'A'] })
   })
 
   const validate = (value: string, { time1, time2 }: FormFields) => {
@@ -38,6 +38,7 @@ export const StageTimeInput: FC = () => {
       <h5>Время начала смен</h5>
       <div className="flex gap-1 [&>input]:flex-grow">
         <TEInput
+          label="Начало дневной"
           type="time"
           id="stagetime1"
           {...register('time1', {
@@ -45,6 +46,7 @@ export const StageTimeInput: FC = () => {
             validate,
           })}></TEInput>
         <TEInput
+          label="Начало ночной"
           type="time"
           id="stagetime2"
           {...register('time2', {
