@@ -8,8 +8,6 @@ type CardProps = {
 }
 
 const Card: FC<CardProps> = ({ data: { status, title, value, performance } }) => {
-  console.log(performance)
-
   return (
     <div className="@container">
       <div

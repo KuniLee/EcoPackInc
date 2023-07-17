@@ -118,7 +118,7 @@
         "type": "function",
         "z": "d8f388f98592d062",
         "name": "Инициализация Global",
-        "func": "global.get('MODBUS_TCP_IP', 'file') || global.set('MODBUS_TCP_IP', '127.0.0.1', 'file')\nglobal.get('ATTEMPTS', 'file') || global.set('ATTEMPTS', 3, 'file')\nglobal.get('ERROR_TIME', 'file') || global.set('ERROR_TIME', 10000, 'file')\nglobal.get('STAGE_TIME', 'file') || global.set('STAGE_TIME', ['09:00','21:00','C'], 'file')",
+        "func": "global.get('MODBUS_TCP_IP', 'file') || global.set('MODBUS_TCP_IP', '127.0.0.1', 'file')\nglobal.get('ATTEMPTS', 'file') || global.set('ATTEMPTS', 3, 'file')\nglobal.get('ERROR_TIME', 'file') || global.set('ERROR_TIME', 10000, 'file')\nglobal.get('STAGE_TIME', 'file') || global.set('STAGE_TIME', ['09:00','21:00','A'], 'file')",
         "outputs": 0,
         "noerr": 0,
         "initialize": "",
@@ -153,7 +153,7 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1070,
+        "x": 1030,
         "y": 260,
         "wires": [
             []
@@ -250,6 +250,131 @@
         "wires": [
             [
                 "d43fee0fedd81d84"
+            ]
+        ]
+    },
+    {
+        "id": "7e866656b47d0f09",
+        "type": "function",
+        "z": "d8f388f98592d062",
+        "name": "Установить смену",
+        "func": "const stagesCycle = global.get('stages')\nconst [time1,time2,stage] = global.get('STAGE_TIME', 'file')\n\nconst currentD = new Date();\nvar startDayStage = new Date();\n// @ts-ignore\nstartDayStage.setHours(...time1.split(':'), 0);\nvar endDayStage = new Date();\n// @ts-ignore\nendDayStage.setHours(...time2.split(':'), 0);\n\nconst isDay = currentD >= startDayStage && currentD < endDayStage\n\nstagesCycle.setStage(stage, isDay)\n\nmsg.url = 'http://127.0.0.1:1880/flow/7e68559fb83a6c0a'\nreturn msg",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "// Добавленный здесь код будет исполняться\n// однократно при развертывании узла.\n\nclass StageCycle {\n    #stages = ['A','B','C','A','D','C','B','D']\n    current = 0\n\n    setStage(stage, isDay){\n       this.current = this.#stages.findIndex((el, idx) => el === stage && idx % 2 !== (+isDay) )\n    }\n    \n    getStage(){\n        return this.#stages[this.current]\n    }\n\n    nextStage() {\n        if (this.current < this.#stages.length - 1)\n        this.current++\n        else this.current = 0\n    }\n}\n\nglobal.set('stages', new StageCycle())",
+        "finalize": "",
+        "libs": [],
+        "x": 490,
+        "y": 440,
+        "wires": [
+            [
+                "5e37b3f337a3789e"
+            ]
+        ]
+    },
+    {
+        "id": "54b5bf7510091755",
+        "type": "link in",
+        "z": "d8f388f98592d062",
+        "name": "link in 1",
+        "links": [
+            "a2fa98132ae64af3"
+        ],
+        "x": 235,
+        "y": 480,
+        "wires": [
+            [
+                "7e866656b47d0f09"
+            ]
+        ]
+    },
+    {
+        "id": "5e37b3f337a3789e",
+        "type": "http request",
+        "z": "d8f388f98592d062",
+        "name": "Load flow",
+        "method": "GET",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 700,
+        "y": 440,
+        "wires": [
+            [
+                "4d39a8deca8e861a"
+            ]
+        ]
+    },
+    {
+        "id": "4d39a8deca8e861a",
+        "type": "function",
+        "z": "d8f388f98592d062",
+        "name": "Изменить время смены смен",
+        "func": "const [time1, time2, stage] = global.get('STAGE_TIME', 'file')\n\nconst firstTimer = msg.payload.nodes.find(({ id }) => id ===\"2f1560f4455dfc50\")\nconst secondTimer = msg.payload.nodes.find(({ id }) => id === \"42586db8ab6bdb7a\")\n\nconst newTime1 = time1.split(':').reverse().join(' ') + ' * * *'\nconst newTime2 = time2.split(':').reverse().join(' ') + ' * * *'\n\nif (firstTimer.crontab !== newTime1 || secondTimer.crontab !== newTime2){\n    firstTimer.crontab = newTime1\n    secondTimer.crontab = newTime2\n\n    msg.headers = {\n        'Content-Type': 'application/json',\n        'Accept': 'application/json'\n    };\n    msg.method = \"PUT\";\n\n    return msg;\n}",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 950,
+        "y": 440,
+        "wires": [
+            [
+                "fa9fb9c320845a13"
+            ]
+        ]
+    },
+    {
+        "id": "fa9fb9c320845a13",
+        "type": "http request",
+        "z": "d8f388f98592d062",
+        "name": "Save flow",
+        "method": "use",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 1220,
+        "y": 440,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "c921e35b28eb862f",
+        "type": "inject",
+        "z": "d8f388f98592d062",
+        "name": "Starten",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 200,
+        "y": 440,
+        "wires": [
+            [
+                "7e866656b47d0f09"
             ]
         ]
     },
@@ -1380,8 +1505,7 @@
         "y": 840,
         "wires": [
             [
-                "c0cd52030be91ae7",
-                "82351c110effcc3b"
+                "c0cd52030be91ae7"
             ]
         ]
     },
@@ -1541,23 +1665,6 @@
         "wires": []
     },
     {
-        "id": "82351c110effcc3b",
-        "type": "debug",
-        "z": "f8267d55bb8665c3",
-        "name": "debug 3",
-        "active": true,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "true",
-        "targetType": "full",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 380,
-        "y": 1000,
-        "wires": []
-    },
-    {
         "id": "a2fa98132ae64af3",
         "type": "link out",
         "z": "f8267d55bb8665c3",
@@ -1593,71 +1700,6 @@
             [
                 "af7d7058.5db5c"
             ]
-        ]
-    },
-    {
-        "id": "af7d7058.5db5c",
-        "type": "http request",
-        "z": "dc35f1f13fade75e",
-        "name": "Load flow",
-        "method": "GET",
-        "ret": "obj",
-        "paytoqs": "ignore",
-        "url": "http://127.0.0.1:1880/flow/global",
-        "tls": "",
-        "persist": false,
-        "proxy": "",
-        "insecureHTTPParser": false,
-        "authType": "",
-        "senderr": false,
-        "headers": [],
-        "x": 500,
-        "y": 180,
-        "wires": [
-            [
-                "116be983.0bdd06"
-            ]
-        ]
-    },
-    {
-        "id": "116be983.0bdd06",
-        "type": "function",
-        "z": "dc35f1f13fade75e",
-        "name": "Modify tcpout settings",
-        "func": "// increment the connection port\n// of the tcp out node with id 20ce9864.df2028\n// increment is done on every input of inject\n// the flowid is set in the topic of the inject \n// node\n\nconst configCopy = JSON.parse(JSON.stringify(msg.payload.configs));\n\nconst dataBaseId = '608ff9c050d10945';\n\nconfigCopy.forEach(function(el) {\n    if (el.id === dataBaseId) {\n        el.host = env.get(\"MYSQL_IP\")\n    }\n});\n\nif (JSON.stringify(msg.payload.configs) === JSON.stringify(configCopy)) return\n\nmsg.payload.configs = configCopy\nmsg.headers = {\n    'Content-Type': 'application/json',\n    'Accept' : 'application/json'};\nmsg.url = \"http://127.0.0.1:1880/flow/global\"\nmsg.method =\"PUT\";\n\nreturn msg;",
-        "outputs": 1,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 760,
-        "y": 180,
-        "wires": [
-            [
-                "c888e5aa.be7428"
-            ]
-        ]
-    },
-    {
-        "id": "c888e5aa.be7428",
-        "type": "http request",
-        "z": "dc35f1f13fade75e",
-        "name": "Save flow",
-        "method": "use",
-        "ret": "obj",
-        "paytoqs": "ignore",
-        "url": "",
-        "tls": "",
-        "persist": false,
-        "proxy": "",
-        "insecureHTTPParser": false,
-        "authType": "",
-        "senderr": false,
-        "headers": [],
-        "x": 1080,
-        "y": 180,
-        "wires": [
-            []
         ]
     },
     {
@@ -1731,6 +1773,71 @@
         "wires": []
     },
     {
+        "id": "af7d7058.5db5c",
+        "type": "http request",
+        "z": "dc35f1f13fade75e",
+        "name": "Load flow",
+        "method": "GET",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "http://127.0.0.1:1880/flow/global",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 500,
+        "y": 180,
+        "wires": [
+            [
+                "116be983.0bdd06"
+            ]
+        ]
+    },
+    {
+        "id": "116be983.0bdd06",
+        "type": "function",
+        "z": "dc35f1f13fade75e",
+        "name": "Modify tcpout settings",
+        "func": "// increment the connection port\n// of the tcp out node with id 20ce9864.df2028\n// increment is done on every input of inject\n// the flowid is set in the topic of the inject \n// node\n\nconst configCopy = JSON.parse(JSON.stringify(msg.payload.configs));\n\nconst dataBaseId = '608ff9c050d10945';\n\nconfigCopy.forEach(function(el) {\n    if (el.id === dataBaseId) {\n        el.host = env.get(\"MYSQL_IP\")\n    }\n});\n\nif (JSON.stringify(msg.payload.configs) === JSON.stringify(configCopy)) return\n\nmsg.payload.configs = configCopy\nmsg.headers = {\n    'Content-Type': 'application/json',\n    'Accept' : 'application/json'};\nmsg.url = \"http://127.0.0.1:1880/flow/global\"\nmsg.method =\"PUT\";\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 760,
+        "y": 180,
+        "wires": [
+            [
+                "c888e5aa.be7428"
+            ]
+        ]
+    },
+    {
+        "id": "c888e5aa.be7428",
+        "type": "http request",
+        "z": "dc35f1f13fade75e",
+        "name": "Save flow",
+        "method": "use",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 1080,
+        "y": 180,
+        "wires": [
+            []
+        ]
+    },
+    {
         "id": "df44bd15fd1035b1",
         "type": "moment",
         "z": "7e68559fb83a6c0a",
@@ -1792,36 +1899,11 @@
         "wires": []
     },
     {
-        "id": "c921e35b28eb862f",
-        "type": "inject",
-        "z": "7e68559fb83a6c0a",
-        "name": "Смена",
-        "props": [
-            {
-                "p": "payload"
-            }
-        ],
-        "repeat": "",
-        "crontab": "",
-        "once": true,
-        "onceDelay": 0.1,
-        "topic": "",
-        "payload": "",
-        "payloadType": "date",
-        "x": 280,
-        "y": 300,
-        "wires": [
-            [
-                "7e866656b47d0f09"
-            ]
-        ]
-    },
-    {
         "id": "35b45ec84dcfa0b5",
         "type": "function",
         "z": "7e68559fb83a6c0a",
         "name": "function 4",
-        "func": "msg.payload = {\n    time: msg.payload,\n    stage: flow.get('stage')\n}\n\nreturn msg;",
+        "func": "msg.payload = {\n    time: msg.payload,\n    stage: global.get('stages').getStage()\n}\n\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
@@ -1836,59 +1918,33 @@
         ]
     },
     {
-        "id": "7e866656b47d0f09",
+        "id": "e20e5f0e3c3c026b",
         "type": "function",
         "z": "7e68559fb83a6c0a",
-        "name": "function 5",
-        "func": "const stagesCycle = flow.get('stages')\nconst [time1,time2,stage] = global.get('STAGE_TIME', 'file')\n\nconst currentD = new Date();\nvar startDayStage = new Date();\n// @ts-ignore\nstartDayStage.setHours(...time1.split(':'), 0);\nvar endDayStage = new Date();\n// @ts-ignore\nendDayStage.setHours(...time2.split(':'), 0);\n\nconst isDay = currentD >= startDayStage && currentD < endDayStage\n\nstagesCycle.setStage(stage, isDay)",
-        "outputs": 1,
+        "name": "Смена - дальше",
+        "func": "const [time1, time2, stage] = global.get('STAGE_TIME', 'file')\nconst stages = global.get('stages')\n\nstages.nextStage()\n\nglobal.set('STAGE_TIME', [time1, time2, stages.getStage() ], 'file')",
+        "outputs": 0,
         "noerr": 0,
-        "initialize": "// Добавленный здесь код будет исполняться\n// однократно при развертывании узла.\n\nclass StageCycle {\n    #stages = ['A','B','C','A','D','C','B','D']\n    current = 0\n\n    setStage(stage, isDay){\n       this.current = this.#stages.findIndex((el, idx) => el === stage && idx % 2 !== (+isDay) )\n    }\n    \n    getStage(){\n        return this.#stages[this.current]\n    }\n}\n\nflow.set('stages', new StageCycle())",
+        "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 600,
-        "y": 300,
-        "wires": [
-            []
-        ]
+        "x": 730,
+        "y": 360,
+        "wires": []
     },
     {
-        "id": "54b5bf7510091755",
-        "type": "link in",
-        "z": "7e68559fb83a6c0a",
-        "name": "link in 1",
-        "links": [
-            "a2fa98132ae64af3"
-        ],
-        "x": 205,
-        "y": 380,
-        "wires": [
-            []
-        ]
-    },
-    {
-        "id": "923569ae79cca3da",
+        "id": "2f1560f4455dfc50",
         "type": "inject",
         "z": "7e68559fb83a6c0a",
-        "name": "",
-        "props": [
-            {
-                "p": "payload"
-            },
-            {
-                "p": "topic",
-                "vt": "str"
-            }
-        ],
+        "name": "Таймер дневной смены",
+        "props": [],
         "repeat": "",
-        "crontab": "",
+        "crontab": "13 14 * * *",
         "once": false,
         "onceDelay": 0.1,
         "topic": "",
-        "payload": "",
-        "payloadType": "date",
-        "x": 320,
-        "y": 520,
+        "x": 350,
+        "y": 360,
         "wires": [
             [
                 "e20e5f0e3c3c026b"
@@ -1896,20 +1952,22 @@
         ]
     },
     {
-        "id": "e20e5f0e3c3c026b",
-        "type": "function",
+        "id": "42586db8ab6bdb7a",
+        "type": "inject",
         "z": "7e68559fb83a6c0a",
-        "name": "function 6",
-        "func": "const stagesCycle = flow.get('stages')\n\nnode.warn(stagesCycle.getStage());\n",
-        "outputs": 1,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 500,
-        "y": 520,
+        "name": "Таймер ночной смены",
+        "props": [],
+        "repeat": "",
+        "crontab": "00 21 * * *",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 350,
+        "y": 400,
         "wires": [
-            []
+            [
+                "e20e5f0e3c3c026b"
+            ]
         ]
     }
 ]
