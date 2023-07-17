@@ -18,9 +18,12 @@ export type DeviceConfig = {
   Screen: number
 }
 
+export const StageLetters = ['A', 'B', 'C', 'D'] as const
+export type StageLettersType = (typeof StageLetters)[number]
+
 export type Configs = {
   MODBUS_TCP_IP: string
   ATTEMPTS: number
   ERROR_TIME: number
-  STAGE_TIME: [string, string, 'A' | 'B' | 'C' | 'D']
+  STAGE_TIME: [string, string, StageLettersType]
 }

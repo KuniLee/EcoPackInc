@@ -118,7 +118,7 @@
         "type": "function",
         "z": "d8f388f98592d062",
         "name": "Инициализация Global",
-        "func": "global.get('MODBUS_TCP_IP', 'file') || global.set('MODBUS_TCP_IP', '127.0.0.1', 'file')\nglobal.get('ATTEMPTS', 'file') || global.set('ATTEMPTS', 3, 'file')\nglobal.get('ERROR_TIME', 'file') || global.set('ERROR_TIME', 10000, 'file')\nglobal.get('STAGE_TIME', 'file') || global.set('STAGE_TIME', ['09:00','21:00','A'], 'file')",
+        "func": "global.get('MODBUS_TCP_IP', 'file') || global.set('MODBUS_TCP_IP', '127.0.0.1', 'file')\nglobal.get('ATTEMPTS', 'file') || global.set('ATTEMPTS', 3, 'file')\nglobal.get('ERROR_TIME', 'file') || global.set('ERROR_TIME', 10000, 'file')\nglobal.get('STAGE_TIME', 'file') || global.set('STAGE_TIME', ['09:00','21:00','C'], 'file')",
         "outputs": 0,
         "noerr": 0,
         "initialize": "",
