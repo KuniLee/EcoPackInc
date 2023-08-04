@@ -32,7 +32,7 @@
 			</Groups>
 			<Register>
 				<Name>Value</Name>
-				<Addr>1001</Addr>
+				<Addr>1003</Addr>
 				<BitAddr>0</BitAddr>
 				<vType>3</vType>
 				<Description>Текущее значение</Description>

@@ -19,7 +19,7 @@ const DeviceForm: FC<DeviceFormProp> = ({ defaultValue, onDelete, onSubmit: onSu
     handleSubmit,
   } = useForm<DeviceConfig>({
     values: defaultValue,
-    defaultValues: { ResetRegAdr: 1, ValueRegAdr: 1001 },
+    defaultValues: { ResetRegAdr: 1, ValueRegAdr: 1003 },
   })
 
   const onSubmit = handleSubmit(onSubmitFunc)
