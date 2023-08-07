@@ -70,7 +70,6 @@
         "id": "608ff9c050d10945",
         "type": "MySQLdatabase",
         "name": "mysql-db",
-        "host": "127.0.0.1",
         "port": "3306",
         "db": "DataBase",
         "tz": "",
@@ -153,7 +152,7 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1030,
+        "x": 1050,
         "y": 260,
         "wires": [
             []
@@ -177,7 +176,7 @@
         "links": [
             "3b36fa04cce40f0c"
         ],
-        "x": 315,
+        "x": 305,
         "y": 340,
         "wires": [
             [
@@ -249,7 +248,8 @@
         "y": 260,
         "wires": [
             [
-                "d43fee0fedd81d84"
+                "d43fee0fedd81d84",
+                "c4b7301bcd14a36f"
             ]
         ]
     },
@@ -377,6 +377,19 @@
                 "7e866656b47d0f09"
             ]
         ]
+    },
+    {
+        "id": "c4b7301bcd14a36f",
+        "type": "link out",
+        "z": "d8f388f98592d062",
+        "name": "link out 5",
+        "mode": "link",
+        "links": [
+            "15dfe187e0651e45"
+        ],
+        "x": 625,
+        "y": 340,
+        "wires": []
     },
     {
         "id": "5c7d0c636d0abba8",
@@ -1723,7 +1736,7 @@
         "fieldType": "msg",
         "format": "handlebars",
         "syntax": "mustache",
-        "template": "SET NAMES utf8mb4;\n\nCREATE TABLE IF NOT EXISTS `ModbusCounters` (\n  `ModbusID` tinyint unsigned NOT NULL COMMENT 'Id модбас устройства',\n  `Name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT 'Отображаемое имя',\n  `IsRequested` bit(1) NOT NULL COMMENT 'Опрашивается или нет',\n  `ValueRegAdr` smallint unsigned NOT NULL DEFAULT '1001' COMMENT 'Адрес регистра текущего значения',\n  `ResetRegAdr` smallint unsigned NOT NULL DEFAULT '1' COMMENT 'Адрес Coil сброса',\n  `Screen` tinyint unsigned NOT NULL COMMENT 'Экран для отображения',\n  PRIMARY KEY (`ModbusID`)\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;",
+        "template": "SET NAMES utf8mb4;\n\nCREATE TABLE IF NOT EXISTS `ModbusCounters` (\n  `ModbusID` tinyint unsigned NOT NULL COMMENT 'Id модбас устройства',\n  `Name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT 'Отображаемое имя',\n  `IsRequested` bit(1) NOT NULL COMMENT 'Опрашивается или нет',\n  `ValueRegAdr` smallint unsigned NOT NULL DEFAULT '1003' COMMENT 'Адрес регистра текущего значения',\n  `ResetRegAdr` smallint unsigned NOT NULL DEFAULT '1' COMMENT 'Адрес Coil сброса',\n  `Screen` tinyint unsigned NOT NULL COMMENT 'Экран для отображения',\n  PRIMARY KEY (`ModbusID`)\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;",
         "output": "str",
         "x": 460,
         "y": 300,
@@ -1838,6 +1851,22 @@
         ]
     },
     {
+        "id": "15dfe187e0651e45",
+        "type": "link in",
+        "z": "dc35f1f13fade75e",
+        "name": "link in 2",
+        "links": [
+            "c4b7301bcd14a36f"
+        ],
+        "x": 265,
+        "y": 380,
+        "wires": [
+            [
+                "08600ded3b72ae71"
+            ]
+        ]
+    },
+    {
         "id": "df44bd15fd1035b1",
         "type": "moment",
         "z": "7e68559fb83a6c0a",
@@ -1939,7 +1968,7 @@
         "name": "Таймер дневной смены",
         "props": [],
         "repeat": "",
-        "crontab": "13 14 * * *",
+        "crontab": "00 09 * * *",
         "once": false,
         "onceDelay": 0.1,
         "topic": "",
