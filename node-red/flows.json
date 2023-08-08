@@ -40,6 +40,14 @@
         "env": []
     },
     {
+        "id": "df21a5b106a947a5",
+        "type": "tab",
+        "label": "Архивация",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
         "id": "b8dd5dc2.87841",
         "type": "modbus-client",
         "name": "modbusTCPserver",
@@ -479,7 +487,7 @@
         "type": "function",
         "z": "6e52c1301b78909b",
         "name": "function 1",
-        "func": "const devices = global.get('devices') || []\n\nconst skipedDevs = flow.get('skipedDevs')\n\n\nconst requestedDevs = devices.filter(({ IsRequested, ModbusID }) => IsRequested && !skipedDevs.has(ModbusID))\n\nmsg.sequences = requestedDevs.map(el=>({\n    name: el.Name,\n    fc: 4,\n    address: el.ValueRegAdr,\n    unitid: el.ModbusID,\n    quantity: 2,    \n}))\n\nreturn msg;",
+        "func": "const devices = global.get('devices') || []\n\nconst skipedDevs = global.get('skipedDevs')\n\n\nconst requestedDevs = devices.filter(({ IsRequested, ModbusID }) => IsRequested && !skipedDevs.has(ModbusID))\n\nmsg.sequences = requestedDevs.map(el=>({\n    name: el.Name,\n    fc: 4,\n    address: el.ValueRegAdr,\n    unitid: el.ModbusID,\n    quantity: 2,    \n}))\n\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
@@ -576,7 +584,7 @@
         "type": "function",
         "z": "6e52c1301b78909b",
         "name": "function 2",
-        "func": "const errCtr = flow.get('errorsCounter')\n\nconst errId = msg.payload.unitid\n\nconst now = Date.now()\n\n\nif (errCtr[errId] && now - errCtr[errId].lastTime < global.get('ERROR_TIME', 'file')){\n    errCtr[errId].counter++\n    errCtr[errId].lastTime = Date.now()\n} else errCtr[errId] = { counter: 1, lastTime: now }\n\n\nif (errCtr[errId].counter >= global.get('ATTEMPTS', 'file')) {\n    const skipedDevs = flow.get('skipedDevs')\n    skipedDevs.add(errId)\n    delete errCtr[errId]\n}",
+        "func": "const errCtr = flow.get('errorsCounter')\n\nconst errId = msg.payload.unitid\n\nconst now = Date.now()\n\n\nif (errCtr[errId] && now - errCtr[errId].lastTime < global.get('ERROR_TIME', 'file')){\n    errCtr[errId].counter++\n    errCtr[errId].lastTime = Date.now()\n} else errCtr[errId] = { counter: 1, lastTime: now }\n\n\nif (errCtr[errId].counter >= global.get('ATTEMPTS', 'file')) {\n    const skipedDevs = global.get('skipedDevs')\n    skipedDevs.add(errId)\n    delete errCtr[errId]\n}",
         "outputs": 0,
         "noerr": 0,
         "initialize": "",
@@ -591,7 +599,7 @@
         "type": "function",
         "z": "6e52c1301b78909b",
         "name": "Инициализация контекста",
-        "func": "flow.set('errorsCounter', {})\nflow.set('skipedDevs', new Set())\nglobal.set('values', {})",
+        "func": "flow.set('errorsCounter', {})\nglobal.set('skipedDevs', new Set())\nglobal.set('values', {})",
         "outputs": 0,
         "noerr": 0,
         "initialize": "",
@@ -622,8 +630,8 @@
         "topic": "",
         "payload": "",
         "payloadType": "date",
-        "x": 190,
-        "y": 960,
+        "x": 170,
+        "y": 780,
         "wires": [
             [
                 "71976d13f1ada451"
@@ -635,14 +643,14 @@
         "type": "function",
         "z": "6e52c1301b78909b",
         "name": "function 3",
-        "func": "const devices = global.get('devices') || []\nconst skipedDevs = flow.get('skipedDevs')\nconst values = global.get('values')\n\nconst package = []\n\n\ndevices.forEach(( el )=>{\n\n    const id = el.ModbusID\n    const title = el.Name\n    const screen = el.Screen\n    let value = null\n    let performance = null\n    if (id in values){\n        value = values[id]?.value\n        performance = values[id]?.performance\n    }\n\n    if (!screen) return\n\n    let status = 'ok'\n\n    if (!el.IsRequested) status = 'disabled'\n    else if (skipedDevs.has(id)) status = 'error'\n\n    package.push({ id, title, screen, status, value, performance})   \n\n});\n\nmsg.payload = package\n\nif (package.length) return msg;\n",
+        "func": "const devices = global.get('devices') || []\nconst skipedDevs = global.get('skipedDevs')\nconst values = global.get('values')\n\nconst package = []\n\n\ndevices.forEach(( el )=>{\n\n    const id = el.ModbusID\n    const title = el.Name\n    const screen = el.Screen\n    let value = null\n    let performance = null\n    if (id in values){\n        value = values[id]?.value\n        performance = values[id]?.performance\n    }\n\n    if (!screen) return\n\n    let status = 'ok'\n\n    if (!el.IsRequested) status = 'disabled'\n    else if (skipedDevs.has(id)) status = 'error'\n\n    package.push({ id, title, screen, status, value, performance})   \n\n});\n\nmsg.payload = package\n\nif (package.length) return msg;\n",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 500,
-        "y": 960,
+        "x": 480,
+        "y": 780,
         "wires": [
             [
                 "f1a1f104ea0bff18",
@@ -673,8 +681,8 @@
         "z": "6e52c1301b78909b",
         "name": "Переодическая отправка значений в websocket",
         "info": "",
-        "x": 260,
-        "y": 920,
+        "x": 240,
+        "y": 740,
         "wires": []
     },
     {
@@ -742,7 +750,7 @@
         "type": "function",
         "z": "6e52c1301b78909b",
         "name": "Попытка опроса отключённых",
-        "func": "const devices = global.get('devices') || []\n\nconst skipedDevs = flow.get('skipedDevs')\n\n\nmsg.sequences = Array.from(skipedDevs).reduce((acc, el)=>{\n    const dev = devices.find(dev => dev.ModbusID == el)\n\n    if (dev === undefined || !dev.IsRequested) {\n        skipedDevs.delete(el)\n        return acc\n    }\n\n    if (dev.IsRequested) return [...acc, {\n        name: dev.Name,\n        fc: 4,\n        address: dev.ValueRegAdr,\n        unitid: dev.ModbusID,\n        quantity: 2,\n    }]\n\n},[])\n\nreturn msg;",
+        "func": "const devices = global.get('devices') || []\n\nconst skipedDevs = global.get('skipedDevs')\n\n\nmsg.sequences = Array.from(skipedDevs).reduce((acc, el)=>{\n    const dev = devices.find(dev => dev.ModbusID == el)\n\n    if (dev === undefined || !dev.IsRequested) {\n        skipedDevs.delete(el)\n        return acc\n    }\n\n    if (dev.IsRequested) return [...acc, {\n        name: dev.Name,\n        fc: 4,\n        address: dev.ValueRegAdr,\n        unitid: dev.ModbusID,\n        quantity: 2,\n    }]\n\n},[])\n\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
@@ -761,13 +769,13 @@
         "type": "function",
         "z": "6e52c1301b78909b",
         "name": "Исключить из пропущенных",
-        "func": "flow.get('skipedDevs').delete(+msg.unitId)",
+        "func": "global.get('skipedDevs').delete(+msg.unitId)",
         "outputs": 0,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1020,
+        "x": 1040,
         "y": 460,
         "wires": []
     },
@@ -778,8 +786,8 @@
         "name": "",
         "server": "f8eb90804d4934dd",
         "client": "",
-        "x": 910,
-        "y": 960,
+        "x": 890,
+        "y": 780,
         "wires": []
     },
     {
@@ -795,8 +803,8 @@
         "targetType": "msg",
         "statusVal": "",
         "statusType": "auto",
-        "x": 740,
-        "y": 1040,
+        "x": 720,
+        "y": 860,
         "wires": []
     },
     {
@@ -821,7 +829,7 @@
         "payload": "",
         "payloadType": "date",
         "x": 170,
-        "y": 660,
+        "y": 600,
         "wires": [
             [
                 "92746cdeb1b34e60"
@@ -835,7 +843,7 @@
         "name": "Вычисление производиетльности",
         "info": "",
         "x": 180,
-        "y": 620,
+        "y": 560,
         "wires": []
     },
     {
@@ -850,7 +858,7 @@
         "finalize": "",
         "libs": [],
         "x": 560,
-        "y": 660,
+        "y": 600,
         "wires": []
     },
     {
@@ -858,7 +866,7 @@
         "type": "debug",
         "z": "6e52c1301b78909b",
         "name": "debug 2",
-        "active": true,
+        "active": false,
         "tosidebar": true,
         "console": false,
         "tostatus": false,
@@ -1736,7 +1744,7 @@
         "fieldType": "msg",
         "format": "handlebars",
         "syntax": "mustache",
-        "template": "SET NAMES utf8mb4;\n\nCREATE TABLE IF NOT EXISTS `ModbusCounters` (\n  `ModbusID` tinyint unsigned NOT NULL COMMENT 'Id модбас устройства',\n  `Name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT 'Отображаемое имя',\n  `IsRequested` bit(1) NOT NULL COMMENT 'Опрашивается или нет',\n  `ValueRegAdr` smallint unsigned NOT NULL DEFAULT '1003' COMMENT 'Адрес регистра текущего значения',\n  `ResetRegAdr` smallint unsigned NOT NULL DEFAULT '1' COMMENT 'Адрес Coil сброса',\n  `Screen` tinyint unsigned NOT NULL COMMENT 'Экран для отображения',\n  PRIMARY KEY (`ModbusID`)\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;",
+        "template": "SET NAMES utf8mb4;\n\nCREATE TABLE IF NOT EXISTS `ModbusCounters` (\n  `ModbusID` tinyint unsigned NOT NULL COMMENT 'Id модбас устройства',\n  `Name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT 'Отображаемое имя',\n  `IsRequested` bit(1) NOT NULL COMMENT 'Опрашивается или нет',\n  `ValueRegAdr` smallint unsigned NOT NULL DEFAULT '1003' COMMENT 'Адрес регистра текущего значения',\n  `ResetRegAdr` smallint unsigned NOT NULL DEFAULT '1' COMMENT 'Адрес Coil сброса',\n  `Screen` tinyint unsigned NOT NULL COMMENT 'Экран для отображения',\n  PRIMARY KEY (`ModbusID`)\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;\n\nCREATE TABLE IF NOT EXISTS `ArchiveData` (\n  `id` bigint unsigned NOT NULL AUTO_INCREMENT PRIMARY KEY,\n  `dateTime` datetime NOT NULL,\n  `modbusId` tinyint unsigned NOT NULL,\n  `stage` char(1) NULL DEFAULT '',\n  `value` mediumint unsigned NOT NULL\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;",
         "output": "str",
         "x": 460,
         "y": 300,
@@ -1858,7 +1866,7 @@
         "links": [
             "c4b7301bcd14a36f"
         ],
-        "x": 265,
+        "x": 275,
         "y": 380,
         "wires": [
             [
@@ -1883,8 +1891,8 @@
         "output": "payload",
         "outputType": "msg",
         "outTz": "Asia/Yekaterinburg",
-        "x": 600,
-        "y": 620,
+        "x": 640,
+        "y": 500,
         "wires": [
             [
                 "35b45ec84dcfa0b5"
@@ -1908,8 +1916,8 @@
         "topic": "",
         "payload": "",
         "payloadType": "date",
-        "x": 290,
-        "y": 620,
+        "x": 330,
+        "y": 500,
         "wires": [
             [
                 "df44bd15fd1035b1"
@@ -1923,8 +1931,8 @@
         "name": "",
         "server": "e0707ccdfb3f12e8",
         "client": "",
-        "x": 1070,
-        "y": 620,
+        "x": 1110,
+        "y": 500,
         "wires": []
     },
     {
@@ -1938,8 +1946,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 840,
-        "y": 620,
+        "x": 880,
+        "y": 500,
         "wires": [
             [
                 "0ffb7b2d93f5ec64"
@@ -1998,5 +2006,113 @@
                 "e20e5f0e3c3c026b"
             ]
         ]
+    },
+    {
+        "id": "684e0fb75ab82082",
+        "type": "cronplus",
+        "z": "df21a5b106a947a5",
+        "name": "",
+        "outputField": "payload",
+        "timeZone": "",
+        "storeName": "",
+        "commandResponseMsgOutput": "output1",
+        "defaultLocation": "",
+        "defaultLocationType": "default",
+        "outputs": 1,
+        "options": [
+            {
+                "name": "schedule1",
+                "topic": "timestamp",
+                "payloadType": "date",
+                "payload": "",
+                "expressionType": "cron",
+                "expression": "0 */10 * * * *",
+                "location": "",
+                "offset": "0",
+                "solarType": "all",
+                "solarEvents": "sunrise,sunset"
+            }
+        ],
+        "x": 140,
+        "y": 120,
+        "wires": [
+            [
+                "873dda3a08df0990"
+            ]
+        ]
+    },
+    {
+        "id": "ad83da4e41fbe487",
+        "type": "function",
+        "z": "df21a5b106a947a5",
+        "name": "Сделать запись",
+        "func": "const datetime = msg.payload\nconst devices = global.get('devices') || []\nconst skipedDevs = global.get('skipedDevs')\nconst values = global.get('values')\n\nconst stage = global.get('stages').getStage()\n\nconst query = devices\n    .filter(({ IsRequested, ModbusID }) => IsRequested && ModbusID in values)\n    .reduce((acc, el) => {\n        const id = el.ModbusID\n        const value = values[id]?.value || null\n        acc.push(`INSERT INTO ArchiveData (datetime, modbusId, stage, value) VALUES('${datetime}', ${id}, '${stage}', ${value});`)\n        return acc\n        },[]);\n\nif (query.length === 0) return\n\nmsg.topic = query.join('\\r\\n')\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 660,
+        "y": 120,
+        "wires": [
+            [
+                "2dc1427a5f845305",
+                "b90ca50d9c9f8717"
+            ]
+        ]
+    },
+    {
+        "id": "873dda3a08df0990",
+        "type": "moment",
+        "z": "df21a5b106a947a5",
+        "name": "",
+        "topic": "",
+        "input": "payload",
+        "inputType": "msg",
+        "inTz": "Asia/Yekaterinburg",
+        "adjAmount": 0,
+        "adjType": "days",
+        "adjDir": "add",
+        "format": "YYYY-MM-DD HH:mm:ss",
+        "locale": "ru-RU",
+        "output": "payload",
+        "outputType": "msg",
+        "outTz": "Asia/Yekaterinburg",
+        "x": 400,
+        "y": 120,
+        "wires": [
+            [
+                "ad83da4e41fbe487"
+            ]
+        ]
+    },
+    {
+        "id": "b90ca50d9c9f8717",
+        "type": "mysql",
+        "z": "df21a5b106a947a5",
+        "mydb": "608ff9c050d10945",
+        "name": "",
+        "x": 840,
+        "y": 120,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "2dc1427a5f845305",
+        "type": "debug",
+        "z": "df21a5b106a947a5",
+        "name": "debug 3",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "topic",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 840,
+        "y": 60,
+        "wires": []
     }
 ]

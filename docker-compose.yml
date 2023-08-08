@@ -31,7 +31,7 @@ services:
       - "1880:1880"
     tty: true
     environment:
-      TZ: Asia/Yekaterinburg
+      TZ: ${TZ}
       MYSQL_IP: ${MYSQL_IP_ENV}
     volumes:
       - ./settings:/data/context/global
@@ -47,6 +47,7 @@ services:
       MYSQL_DATABASE: ${MYSQL_DATABASE}
       MYSQL_USER: ${MYSQL_USER}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      TZ: ${TZ}
     volumes:
       - ./dbdata:/var/lib/mysql/
 
