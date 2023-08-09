@@ -14,6 +14,9 @@ Object.keys(process.env).forEach((key) => {
 
 export default defineConfig({
   plugins: [react(), eslint(), svgr()],
+  build: {
+    target: 'es2015',
+  },
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
