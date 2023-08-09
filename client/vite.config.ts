@@ -4,6 +4,7 @@ import eslint from 'vite-plugin-eslint'
 import path from 'path'
 import svgr from 'vite-plugin-svgr'
 import lightningcss from 'vite-plugin-lightningcss'
+import legacy from '@vitejs/plugin-legacy'
 
 const viteEnv: { [key: string]: string } = {}
 
@@ -16,16 +17,16 @@ Object.keys(process.env).forEach((key) => {
 export default defineConfig({
   plugins: [
     react(),
+    legacy({
+      targets: ['>0.2%', 'chrome > 38', 'dead'],
+    }),
     eslint(),
     svgr(),
     lightningcss({
       minify: true,
-      browserslist: '>= 0.25%',
+      browserslist: ['>0.2%', 'chrome > 38', 'dead'],
     }),
   ],
-  build: {
-    target: 'es2015',
-  },
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
