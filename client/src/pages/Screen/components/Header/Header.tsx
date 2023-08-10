@@ -9,7 +9,7 @@ type WebSocketMsg = {
 const Header: FC = () => {
   const [data, setData] = useState<WebSocketMsg>()
 
-  const { lastJsonMessage } = useWebSocket<WebSocketMsg>(`ws://${window.location.hostname}/ws/time`, {
+  const { lastJsonMessage } = useWebSocket<WebSocketMsg>(`ws://${window.location.host}/ws/time`, {
     shouldReconnect: () => true,
   })
 
