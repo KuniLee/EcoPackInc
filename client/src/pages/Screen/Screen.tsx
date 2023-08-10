@@ -15,7 +15,7 @@ const Screen: FC = () => {
   const { screenId } = useParams<RouteParams>()
   const [data, setData] = useState<DeviceData[]>([])
 
-  const { lastJsonMessage } = useWebSocket<DeviceData[]>(`ws://${window.location.hostname}:1880/ws/data`, {
+  const { lastJsonMessage } = useWebSocket<DeviceData[]>(`ws://${window.location.hostname}/ws/data`, {
     shouldReconnect: () => true,
   })
 
