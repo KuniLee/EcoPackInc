@@ -27,6 +27,17 @@ export default defineConfig({
       browserslist: ['>0.2%', 'chrome > 38', 'dead'],
     }),
   ],
+  server: {
+    proxy: {
+      '/api': {
+        target: 'http://localhost:1880',
+      },
+      '/ws': {
+        target: 'http://localhost:1880',
+        ws: true,
+      },
+    },
+  },
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
