@@ -15,6 +15,7 @@ export type DeviceConfig = {
   IsRequested: boolean
   ValueRegAdr: number
   ResetRegAdr: number
+  StagePlan: number | null
   Screen: number
 }
 

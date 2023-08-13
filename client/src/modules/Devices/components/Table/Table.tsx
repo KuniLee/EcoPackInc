@@ -1,6 +1,7 @@
 import { FC } from 'react'
 import { DeviceConfig } from '@/models/types'
 import { AiOutlineCheckCircle, AiOutlineCloseCircle } from 'react-icons/ai'
+import { isNull } from 'lodash'
 
 type TableProps = {
   devices: DeviceConfig[]
@@ -20,6 +21,9 @@ const Table: FC<TableProps> = ({ devices, onClick }) => {
                   </th>
                   <th scope="col" className="border-r px-6 py-2">
                     Название
+                  </th>
+                  <th scope="col" className="border-r px-6 py-2">
+                    План
                   </th>
                   <th scope="col" className="border-r px-6 py-2">
                     Опрос
@@ -44,6 +48,9 @@ const Table: FC<TableProps> = ({ devices, onClick }) => {
                     className="border-b dark:border-neutral-500 cursor-pointer">
                     <td className="whitespace-nowrap border-r px-6 py-2 font-medium">{el.ModbusID}</td>
                     <td className="whitespace-nowrap border-r px-6 py-2">{el.Name}</td>
+                    <td className="whitespace-nowrap border-r px-6 py-2">
+                      {isNull(el.StagePlan) ? '-' : el.StagePlan}
+                    </td>
                     <td className="whitespace-nowrap border-r px-6 py-1">
                       {el.IsRequested ? (
                         <AiOutlineCheckCircle className="fill-success inline-block w-6 h-6" />

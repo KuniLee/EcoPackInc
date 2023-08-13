@@ -1051,7 +1051,7 @@
         "type": "function",
         "z": "f8267d55bb8665c3",
         "name": "Проверка",
-        "func": "const newDevice = msg.req.body\n\nmsg.payload = newDevice\n\nmsg.topic = `INSERT INTO ModbusCounters (ModbusID, Name, IsRequested, ValueRegAdr, ResetRegAdr, Screen)\nVALUES(:ModbusID, :Name, CONV(:IsRequested, 2, 10) + 0, :ValueRegAdr, :ResetRegAdr, :Screen);`\n\n\nreturn msg;",
+        "func": "const newDevice = msg.req.body\n\nmsg.payload = newDevice\n\nmsg.topic = `INSERT INTO ModbusCounters (ModbusID, Name, IsRequested, ValueRegAdr, ResetRegAdr, Screen, StagePlan)\nVALUES(:ModbusID, :Name, CONV(:IsRequested, 2, 10) + 0, :ValueRegAdr, :ResetRegAdr, :Screen, :StagePlan);`\n\n\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
@@ -1414,7 +1414,7 @@
         "type": "function",
         "z": "f8267d55bb8665c3",
         "name": "Проверка",
-        "func": "const newDevice = msg.req.body\n\nconst oldId = msg.req.params.id\n\n\nif (!global.get('devices').find(el => el.ModbusID == oldId)) return [undefined, msg]\n\nconst newParams = []\n\nfor (let prop in newDevice) {\n\n    if (prop === 'IsRequested') newParams.push(`${prop} = CONV(${newDevice[prop]}, 2, 10) + 0`)\n    else newParams.push(`${prop} = '${newDevice[prop]}'`)\n}\n\nmsg.topic = `UPDATE ModbusCounters SET ${newParams.join(\", \")} WHERE ModbusID = ${oldId}`\n\nreturn msg;",
+        "func": "const newDevice = msg.req.body\n\nconst oldId = msg.req.params.id\n\n\nif (!global.get('devices').find(el => el.ModbusID == oldId)) return [undefined, msg]\n\nconst newParams = []\n\nnode.warn(newDevice);\n\nfor (let prop in newDevice) {\n    if (prop === 'IsRequested') newParams.push(`${prop} = CONV(${newDevice[prop]}, 2, 10) + 0`)\n    else if (newDevice[prop] === null) newParams.push(`${prop} = null`)\n    else newParams.push(`${prop} = '${newDevice[prop]}'`)\n}\n\nmsg.topic = `UPDATE ModbusCounters SET ${newParams.join(\", \")} WHERE ModbusID = ${oldId}`\n\nreturn msg;",
         "outputs": 2,
         "noerr": 0,
         "initialize": "",
@@ -1424,7 +1424,8 @@
         "y": 600,
         "wires": [
             [
-                "b43dd66cf14e1b5c"
+                "b43dd66cf14e1b5c",
+                "26bbfd703ad12e58"
             ],
             [
                 "87122c7414d8fa7a"
@@ -1671,6 +1672,23 @@
         "wires": []
     },
     {
+        "id": "26bbfd703ad12e58",
+        "type": "debug",
+        "z": "f8267d55bb8665c3",
+        "name": "debug 4",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 540,
+        "y": 640,
+        "wires": []
+    },
+    {
         "id": "39dd64a2.77696c",
         "type": "inject",
         "z": "dc35f1f13fade75e",
@@ -1716,7 +1734,7 @@
         "fieldType": "msg",
         "format": "handlebars",
         "syntax": "mustache",
-        "template": "SET NAMES utf8mb4;\n\nCREATE TABLE IF NOT EXISTS `ModbusCounters` (\n  `ModbusID` tinyint unsigned NOT NULL COMMENT 'Id модбас устройства',\n  `Name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT 'Отображаемое имя',\n  `IsRequested` bit(1) NOT NULL COMMENT 'Опрашивается или нет',\n  `ValueRegAdr` smallint unsigned NOT NULL DEFAULT '1003' COMMENT 'Адрес регистра текущего значения',\n  `ResetRegAdr` smallint unsigned NOT NULL DEFAULT '1' COMMENT 'Адрес Coil сброса',\n  `Screen` tinyint unsigned NOT NULL COMMENT 'Экран для отображения',\n  PRIMARY KEY (`ModbusID`)\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;\n\nCREATE TABLE IF NOT EXISTS `ArchiveData` (\n  `id` bigint unsigned NOT NULL AUTO_INCREMENT PRIMARY KEY,\n  `dateTime` datetime NOT NULL,\n  `modbusId` tinyint unsigned NOT NULL,\n  `stage` char(1) NULL DEFAULT '',\n  `value` mediumint unsigned NOT NULL\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;",
+        "template": "SET NAMES utf8mb4;\n\nCREATE TABLE IF NOT EXISTS `ModbusCounters` (\n  `ModbusID` tinyint unsigned NOT NULL COMMENT 'Id модбас устройства',\n  `Name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT 'Отображаемое имя',\n  `IsRequested` bit(1) NOT NULL COMMENT 'Опрашивается или нет',\n  `ValueRegAdr` smallint unsigned NOT NULL DEFAULT '1003' COMMENT 'Адрес регистра текущего значения',\n  `ResetRegAdr` smallint unsigned NOT NULL DEFAULT '1' COMMENT 'Адрес Coil сброса',\n  `StagePlan` smallint unsigned NULL COMMENT 'План на смену',\n  `Screen` tinyint unsigned NOT NULL COMMENT 'Экран для отображения',\n  PRIMARY KEY (`ModbusID`)\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;\n\nCREATE TABLE IF NOT EXISTS `ArchiveData` (\n  `id` bigint unsigned NOT NULL AUTO_INCREMENT PRIMARY KEY,\n  `dateTime` datetime NOT NULL,\n  `modbusId` tinyint unsigned NOT NULL,\n  `stage` char(1) NULL DEFAULT '',\n  `value` mediumint unsigned NOT NULL\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;",
         "output": "str",
         "x": 460,
         "y": 300,

@@ -74,6 +74,18 @@ const DeviceForm: FC<DeviceFormProp> = ({ defaultValue, onDelete, onSubmit: onSu
         <TEInput
           className="mt-6"
           type="number"
+          id={'plan' + id}
+          label="План на смену"
+          max={999999}
+          defaultValue={defaultValue?.StagePlan ?? ''}
+          {...register('StagePlan', { valueAsNumber: true })}>
+          <small id={'planError' + id} className="absolute w-full text-danger-700 dark:text-neutral-200">
+            {errors.StagePlan?.message}
+          </small>
+        </TEInput>
+        <TEInput
+          className="mt-6"
+          type="number"
           id={'valueRegAdr' + id}
           label="Регистр значения"
           disabled={true}
