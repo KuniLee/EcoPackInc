@@ -1,24 +1,45 @@
 import { FC, useEffect, useState } from 'react'
+import { DeviceData } from '@/models/types'
+import { isNull } from 'lodash'
+import cx from 'classnames'
 
 type ProgressProps = {
-  percent: number
+  plan: DeviceData['plan']
+  production: DeviceData['production']
 }
 
-const Progress: FC<ProgressProps> = ({ percent }) => {
+const Progress: FC<ProgressProps> = ({ plan, production }) => {
   const [value, setValue] = useState(0)
 
   useEffect(() => {
-    if (percent <= 100 && percent >= 0) setValue(percent)
-  }, [percent])
+    if (!isNull(plan) && !isNull(production)) {
+      if (plan <= 0) setValue(100)
+      else setValue(Math.round((production / plan) * 100))
+    }
+  }, [production, plan])
+
+  if (isNull(plan) || isNull(production)) return null
 
   return (
-    <div className="w-full bg-neutral-200 rounded overflow-hidden">
-      <div
-        className="bg-primary p-0.5 text-center text-black text-xs font-medium leading-none text-primary-100"
-        style={{ width: value + '%' }}>
-        {percent}%
+    <>
+      <div className="w-full bg-neutral-200 rounded overflow-hidden relative">
+        <div
+          className={cx('min-h-[2em] p-0.5 text-center text-xs font-medium leading-none text-primary-100', {
+            'bg-primary': value >= 100,
+            'bg-red-900': value < 30,
+            'bg-amber-300': value > 30 && value < 100,
+          })}
+          style={{ width: value + '%' }}
+        />
+        <span
+          className={cx('text-center absolute top-0 left-[50%] translate-x-[-50%]', {
+            'text-black': value <= 60,
+            'text-current': value > 60,
+          })}>
+          {value}%
+        </span>
       </div>
-    </div>
+    </>
   )
 }
 

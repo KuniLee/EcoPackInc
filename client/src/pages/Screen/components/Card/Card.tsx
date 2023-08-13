@@ -7,7 +7,7 @@ type CardProps = {
   data: DeviceData
 }
 
-const Card: FC<CardProps> = ({ data: { status, title, value, performance } }) => {
+const Card: FC<CardProps> = ({ data: { status, title, plan, production, performance } }) => {
   return (
     <div className="@container">
       <div
@@ -21,16 +21,26 @@ const Card: FC<CardProps> = ({ data: { status, title, value, performance } }) =>
             '@[270px]:text-xl aspect-square border-[0.2em] rounded-xl p-2'
         )}>
         <h5 className="text-center leading-none text-[1em]">{title}</h5>
-        <Progress percent={50} />
+        <Progress plan={plan} production={production} />
         <div className="flex flex-col">
-          <span className="mb-2 leading-none text-[0.75em]">Значение: </span>
-          <span className="mb-6 leading-none @[900px]:text-[4em] @[400px]:text-[3em] text-[3.2em] self-center">
-            {value === null || value === undefined ? '----' : value}
-          </span>
-          <span className="mb-2 leading-none text-[0.75em]">Производительность (шт/мин):</span>
-          <span className="text-[3.2em] leading-none @[900px]:text-[4em] @[400px]:text-[3em] self-center">
-            {performance === null || performance === undefined ? '----' : performance}
-          </span>
+          <div className="flex justify-between align-top">
+            <span className="leading-none text-[0.75em]">План: </span>
+            <span className="leading-none @[900px]:text-[4em] @[400px]:text-[3em] text-[3em] self-center">
+              {plan === null || plan === undefined ? '----' : plan}
+            </span>
+          </div>
+          <div className="flex justify-between align-top">
+            <span className="leading-none text-[0.75em]">Смена: </span>
+            <span className="leading-none @[900px]:text-[4em] @[400px]:text-[3em] text-[3em] self-center">
+              {production === null || production === undefined ? '----' : production}
+            </span>
+          </div>
+          <div className="flex justify-between align-top">
+            <span className="mb-2 leading-none text-[0.75em]">Шт/мин:</span>
+            <span className="text-[3.2em] leading-none @[900px]:text-[4em] @[400px]:text-[3em] self-center">
+              {performance === null || performance === undefined ? '----' : performance}
+            </span>
+          </div>
         </div>
       </div>
     </div>

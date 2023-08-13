@@ -7,6 +7,8 @@ export type DeviceData = {
   status: DeviceStatus
   value: number | null
   performance: number | null
+  plan: number | null
+  production: number | null
 }
 
 export type DeviceConfig = {

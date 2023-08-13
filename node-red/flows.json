@@ -125,7 +125,7 @@
         "type": "function",
         "z": "d8f388f98592d062",
         "name": "Инициализация Global",
-        "func": "global.get('MODBUS_TCP_IP', 'file') || global.set('MODBUS_TCP_IP', '127.0.0.1', 'file')\nglobal.get('ATTEMPTS', 'file') || global.set('ATTEMPTS', 3, 'file')\nglobal.get('ERROR_TIME', 'file') || global.set('ERROR_TIME', 10000, 'file')\nglobal.get('STAGE_TIME', 'file') || global.set('STAGE_TIME', ['09:00','21:00','A'], 'file')",
+        "func": "global.get('MODBUS_TCP_IP', 'file') || global.set('MODBUS_TCP_IP', '127.0.0.1', 'file')\nglobal.get('ATTEMPTS', 'file') || global.set('ATTEMPTS', 3, 'file')\nglobal.get('ERROR_TIME', 'file') || global.set('ERROR_TIME', 10000, 'file')\nglobal.get('STAGE_TIME', 'file') || global.set('STAGE_TIME', ['09:00','21:00','A'], 'file')\n\nglobal.get('stageProduction') || global.set('stageProduction', {})\n",
         "outputs": 0,
         "noerr": 0,
         "initialize": "",
@@ -269,7 +269,7 @@
         "func": "const stagesCycle = global.get('stages')\nconst [time1,time2,stage] = global.get('STAGE_TIME', 'file')\n\nconst currentD = new Date();\nvar startDayStage = new Date();\n// @ts-ignore\nstartDayStage.setHours(...time1.split(':'), 0);\nvar endDayStage = new Date();\n// @ts-ignore\nendDayStage.setHours(...time2.split(':'), 0);\n\nconst isDay = currentD >= startDayStage && currentD < endDayStage\n\nstagesCycle.setStage(stage, isDay)\n\nmsg.url = 'http://127.0.0.1:1880/flow/7e68559fb83a6c0a'\nreturn msg",
         "outputs": 1,
         "noerr": 0,
-        "initialize": "// Добавленный здесь код будет исполняться\n// однократно при развертывании узла.\n\nclass StageCycle {\n    #stages = ['A','B','C','A','D','C','B','D']\n    current = 0\n\n    setStage(stage, isDay){\n       this.current = this.#stages.findIndex((el, idx) => el === stage && idx % 2 !== (+isDay) )\n    }\n    \n    getStage(){\n        return this.#stages[this.current]\n    }\n\n    nextStage() {\n        if (this.current < this.#stages.length - 1)\n        this.current++\n        else this.current = 0\n    }\n}\n\nglobal.set('stages', new StageCycle())",
+        "initialize": "// Добавленный здесь код будет исполняться\n// однократно при развертывании узла.\n\nclass StageCycle {\n    #stages = ['A','B','C','A','D','C','B','D']\n    current = 0\n\n    setStage(stage, isDay){\n        this.current = this.#stages.findIndex((el, idx) => el === stage && idx % 2 !== (+isDay) )\n        this.setGlobal()\n    }\n\n    setGlobal(){\n        const stageTime = global.get('STAGE_TIME', 'file')\n        stageTime[2] = this.getStage()\n        global.set('STAGE_TIME', stageTime, 'file')\n    }\n    \n    getStage(){\n        return this.#stages[this.current]\n    }\n\n    nextStage() {\n        if (this.current < this.#stages.length - 1)\n        this.current++\n        else this.current = 0\n        this.setGlobal()\n    }\n}\n\nglobal.set('stages', new StageCycle())",
         "finalize": "",
         "libs": [],
         "x": 490,
@@ -404,7 +404,7 @@
         "type": "function",
         "z": "6e52c1301b78909b",
         "name": "Поменять местами байты",
-        "func": "const values = global.get('values')\n\nconst { modbusRequest: { unitid } } = msg\n\nconst buf = msg.payload.buffer.reverse()\n\nfor (let i = 0; i < buf.length; i=i+2) {\n    [buf[i], buf[i + 1]] = [buf[i+1], buf[i]];\n}\n\nconst newValue = buf.readInt32BE(0)\n\nif (values.hasOwnProperty(unitid)) \n    values[unitid].value = buf.readInt32BE(0)\nelse\nvalues[unitid] = {\n        value: newValue,\n    }",
+        "func": "const values = global.get('values')\nconst stageProd = global.get('stageProduction')\n\nconst { modbusRequest: { unitid } } = msg\n\nconst buf = msg.payload.buffer.reverse()\n\nfor (let i = 0; i < buf.length; i=i+2) {\n    [buf[i], buf[i + 1]] = [buf[i+1], buf[i]];\n}\n\nconst newValue = buf.readInt32BE(0)\n\nif (values.hasOwnProperty(unitid)) \n    values[unitid].value = buf.readInt32BE(0)\nelse\nvalues[unitid] = {\n        value: newValue,\n    }\n\nif (!(unitid in stageProd)) {\n    stageProd[unitid] = newValue\n}",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
@@ -643,7 +643,7 @@
         "type": "function",
         "z": "6e52c1301b78909b",
         "name": "function 3",
-        "func": "const devices = global.get('devices') || []\nconst skipedDevs = global.get('skipedDevs')\nconst values = global.get('values')\n\nconst package = []\n\n\ndevices.forEach(( el )=>{\n\n    const id = el.ModbusID\n    const title = el.Name\n    const screen = el.Screen\n    let value = null\n    let performance = null\n    if (id in values){\n        value = values[id]?.value\n        performance = values[id]?.performance\n    }\n\n    if (!screen) return\n\n    let status = 'ok'\n\n    if (!el.IsRequested) status = 'disabled'\n    else if (skipedDevs.has(id)) status = 'error'\n\n    package.push({ id, title, screen, status, value, performance})   \n\n});\n\nmsg.payload = package\n\nif (package.length) return msg;\n",
+        "func": "const devices = global.get('devices') || []\nconst skipedDevs = global.get('skipedDevs')\nconst values = global.get('values')\nconst stageProd = global.get('stageProduction') || {}\n\nconst package = []\n\n\ndevices.forEach(( el )=>{\n\n    const id = el.ModbusID\n    const title = el.Name\n    const screen = el.Screen\n    const plan = el.StagePlan\n    let value = null\n    let performance = null\n    let production = null\n\n    if (id in values){\n        value = values[id]?.value\n        performance = values[id]?.performance\n\n        if (id in stageProd) {\n            const onStageStart = stageProd[id]\n            production = value >= onStageStart ? value - onStageStart : value + 999999 - onStageStart\n        }\n    }\n\n    if (!screen) return\n\n    let status = 'ok'\n\n    if (!el.IsRequested) status = 'disabled'\n    else if (skipedDevs.has(id)) status = 'error'\n\n    package.push({ id, title, screen, status, value, plan, production, performance})   \n\n});\n\nmsg.payload = package\n\nif (package.length) return msg;\n",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
@@ -786,7 +786,7 @@
         "name": "",
         "server": "f8eb90804d4934dd",
         "client": "",
-        "x": 890,
+        "x": 910,
         "y": 780,
         "wires": []
     },
@@ -1072,7 +1072,7 @@
         "name": "",
         "statusCode": "",
         "headers": {},
-        "x": 1210,
+        "x": 1230,
         "y": 280,
         "wires": []
     },
@@ -1414,7 +1414,7 @@
         "type": "function",
         "z": "f8267d55bb8665c3",
         "name": "Проверка",
-        "func": "const newDevice = msg.req.body\n\nconst oldId = msg.req.params.id\n\n\nif (!global.get('devices').find(el => el.ModbusID == oldId)) return [undefined, msg]\n\nconst newParams = []\n\nnode.warn(newDevice);\n\nfor (let prop in newDevice) {\n    if (prop === 'IsRequested') newParams.push(`${prop} = CONV(${newDevice[prop]}, 2, 10) + 0`)\n    else if (newDevice[prop] === null) newParams.push(`${prop} = null`)\n    else newParams.push(`${prop} = '${newDevice[prop]}'`)\n}\n\nmsg.topic = `UPDATE ModbusCounters SET ${newParams.join(\", \")} WHERE ModbusID = ${oldId}`\n\nreturn msg;",
+        "func": "const newDevice = msg.req.body\n\nconst oldId = msg.req.params.id\n\n\nif (!global.get('devices').find(el => el.ModbusID == oldId)) return [undefined, msg]\n\nconst newParams = []\n\nfor (let prop in newDevice) {\n    if (prop === 'IsRequested') newParams.push(`${prop} = CONV(${newDevice[prop]}, 2, 10) + 0`)\n    else if (newDevice[prop] === null) newParams.push(`${prop} = null`)\n    else newParams.push(`${prop} = '${newDevice[prop]}'`)\n}\n\nmsg.topic = `UPDATE ModbusCounters SET ${newParams.join(\", \")} WHERE ModbusID = ${oldId}`\n\nreturn msg;",
         "outputs": 2,
         "noerr": 0,
         "initialize": "",
@@ -1734,7 +1734,7 @@
         "fieldType": "msg",
         "format": "handlebars",
         "syntax": "mustache",
-        "template": "SET NAMES utf8mb4;\n\nCREATE TABLE IF NOT EXISTS `ModbusCounters` (\n  `ModbusID` tinyint unsigned NOT NULL COMMENT 'Id модбас устройства',\n  `Name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT 'Отображаемое имя',\n  `IsRequested` bit(1) NOT NULL COMMENT 'Опрашивается или нет',\n  `ValueRegAdr` smallint unsigned NOT NULL DEFAULT '1003' COMMENT 'Адрес регистра текущего значения',\n  `ResetRegAdr` smallint unsigned NOT NULL DEFAULT '1' COMMENT 'Адрес Coil сброса',\n  `StagePlan` smallint unsigned NULL COMMENT 'План на смену',\n  `Screen` tinyint unsigned NOT NULL COMMENT 'Экран для отображения',\n  PRIMARY KEY (`ModbusID`)\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;\n\nCREATE TABLE IF NOT EXISTS `ArchiveData` (\n  `id` bigint unsigned NOT NULL AUTO_INCREMENT PRIMARY KEY,\n  `dateTime` datetime NOT NULL,\n  `modbusId` tinyint unsigned NOT NULL,\n  `stage` char(1) NULL DEFAULT '',\n  `value` mediumint unsigned NOT NULL\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;",
+        "template": "SET NAMES utf8mb4;\n\nCREATE TABLE IF NOT EXISTS `ModbusCounters` (\n  `ModbusID` tinyint unsigned NOT NULL COMMENT 'Id модбас устройства',\n  `Name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT 'Отображаемое имя',\n  `IsRequested` bit(1) NOT NULL COMMENT 'Опрашивается или нет',\n  `ValueRegAdr` smallint unsigned NOT NULL DEFAULT '1003' COMMENT 'Адрес регистра текущего значения',\n  `ResetRegAdr` smallint unsigned NOT NULL DEFAULT '1' COMMENT 'Адрес Coil сброса',\n  `StagePlan` mediumint unsigned NULL COMMENT 'План на смену',\n  `Screen` tinyint unsigned NOT NULL COMMENT 'Экран для отображения',\n  PRIMARY KEY (`ModbusID`)\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;\n\nCREATE TABLE IF NOT EXISTS `ArchiveData` (\n  `id` bigint unsigned NOT NULL AUTO_INCREMENT PRIMARY KEY,\n  `dateTime` datetime NOT NULL,\n  `modbusId` tinyint unsigned NOT NULL,\n  `stage` char(1) NULL DEFAULT '',\n  `value` mediumint unsigned NOT NULL\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;",
         "output": "str",
         "x": 460,
         "y": 300,
@@ -1949,15 +1949,19 @@
         "type": "function",
         "z": "7e68559fb83a6c0a",
         "name": "Смена - дальше",
-        "func": "const [time1, time2, stage] = global.get('STAGE_TIME', 'file')\nconst stages = global.get('stages')\n\nstages.nextStage()\n\nglobal.set('STAGE_TIME', [time1, time2, stages.getStage() ], 'file')",
-        "outputs": 0,
+        "func": "const stages = global.get('stages')\nstages.nextStage()\n\nreturn mgs",
+        "outputs": 1,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 730,
+        "x": 610,
         "y": 360,
-        "wires": []
+        "wires": [
+            [
+                "198c8cce5dcefc2f"
+            ]
+        ]
     },
     {
         "id": "2f1560f4455dfc50",
@@ -1994,6 +1998,52 @@
         "wires": [
             [
                 "e20e5f0e3c3c026b"
+            ]
+        ]
+    },
+    {
+        "id": "198c8cce5dcefc2f",
+        "type": "function",
+        "z": "7e68559fb83a6c0a",
+        "name": "Запомнить значения",
+        "func": "const stageProd = {}\nconst devices = global.get('devices') || []\nconst skipedDevs = global.get('skipedDevs')\nconst values = global.get('values')\n\n\ndevices.filter(({ IsRequested }) => IsRequested).forEach((el) => {\n    const id = el.ModbusID\n    if (id in values)    \n    stageProd[id]=values[id].value\n});\n\nglobal.set('stageProduction', stageProd)\n\n//node.warn(stageProd)",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 920,
+        "y": 360,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "d7150a29cb9ebd5d",
+        "type": "inject",
+        "z": "7e68559fb83a6c0a",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 620,
+        "y": 280,
+        "wires": [
+            [
+                "198c8cce5dcefc2f"
             ]
         ]
     },
