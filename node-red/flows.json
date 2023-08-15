@@ -32,14 +32,6 @@
         "env": []
     },
     {
-        "id": "7e68559fb83a6c0a",
-        "type": "tab",
-        "label": "Смена/время",
-        "disabled": false,
-        "info": "",
-        "env": []
-    },
-    {
         "id": "df21a5b106a947a5",
         "type": "tab",
         "label": "Архивация",
@@ -1865,189 +1857,6 @@
         ]
     },
     {
-        "id": "df44bd15fd1035b1",
-        "type": "moment",
-        "z": "7e68559fb83a6c0a",
-        "name": "",
-        "topic": "",
-        "input": "payload",
-        "inputType": "msg",
-        "inTz": "Asia/Yekaterinburg",
-        "adjAmount": 0,
-        "adjType": "days",
-        "adjDir": "add",
-        "format": "D MMM HH:mm",
-        "locale": "ru-RU",
-        "output": "payload",
-        "outputType": "msg",
-        "outTz": "Asia/Yekaterinburg",
-        "x": 640,
-        "y": 500,
-        "wires": [
-            [
-                "35b45ec84dcfa0b5"
-            ]
-        ]
-    },
-    {
-        "id": "666fcdacff7783af",
-        "type": "inject",
-        "z": "7e68559fb83a6c0a",
-        "name": "Время сервера",
-        "props": [
-            {
-                "p": "payload"
-            }
-        ],
-        "repeat": "10",
-        "crontab": "",
-        "once": false,
-        "onceDelay": 0.1,
-        "topic": "",
-        "payload": "",
-        "payloadType": "date",
-        "x": 330,
-        "y": 500,
-        "wires": [
-            [
-                "df44bd15fd1035b1"
-            ]
-        ]
-    },
-    {
-        "id": "0ffb7b2d93f5ec64",
-        "type": "websocket out",
-        "z": "7e68559fb83a6c0a",
-        "name": "",
-        "server": "e0707ccdfb3f12e8",
-        "client": "",
-        "x": 1110,
-        "y": 500,
-        "wires": []
-    },
-    {
-        "id": "35b45ec84dcfa0b5",
-        "type": "function",
-        "z": "7e68559fb83a6c0a",
-        "name": "function 4",
-        "func": "msg.payload = {\n    time: msg.payload,\n    stage: global.get('stages').getStage()\n}\n\nreturn msg;",
-        "outputs": 1,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 880,
-        "y": 500,
-        "wires": [
-            [
-                "0ffb7b2d93f5ec64"
-            ]
-        ]
-    },
-    {
-        "id": "e20e5f0e3c3c026b",
-        "type": "function",
-        "z": "7e68559fb83a6c0a",
-        "name": "Смена - дальше",
-        "func": "const stages = global.get('stages')\nstages.nextStage()\n\nreturn mgs",
-        "outputs": 1,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 610,
-        "y": 360,
-        "wires": [
-            [
-                "198c8cce5dcefc2f"
-            ]
-        ]
-    },
-    {
-        "id": "2f1560f4455dfc50",
-        "type": "inject",
-        "z": "7e68559fb83a6c0a",
-        "name": "Таймер дневной смены",
-        "props": [],
-        "repeat": "",
-        "crontab": "00 09 * * *",
-        "once": false,
-        "onceDelay": 0.1,
-        "topic": "",
-        "x": 350,
-        "y": 360,
-        "wires": [
-            [
-                "e20e5f0e3c3c026b"
-            ]
-        ]
-    },
-    {
-        "id": "42586db8ab6bdb7a",
-        "type": "inject",
-        "z": "7e68559fb83a6c0a",
-        "name": "Таймер ночной смены",
-        "props": [],
-        "repeat": "",
-        "crontab": "00 21 * * *",
-        "once": false,
-        "onceDelay": 0.1,
-        "topic": "",
-        "x": 350,
-        "y": 400,
-        "wires": [
-            [
-                "e20e5f0e3c3c026b"
-            ]
-        ]
-    },
-    {
-        "id": "198c8cce5dcefc2f",
-        "type": "function",
-        "z": "7e68559fb83a6c0a",
-        "name": "Запомнить значения",
-        "func": "const stageProd = {}\nconst devices = global.get('devices') || []\nconst skipedDevs = global.get('skipedDevs')\nconst values = global.get('values')\n\n\ndevices.filter(({ IsRequested }) => IsRequested).forEach((el) => {\n    const id = el.ModbusID\n    if (id in values)    \n    stageProd[id]=values[id].value\n});\n\nglobal.set('stageProduction', stageProd)\n\n//node.warn(stageProd)",
-        "outputs": 1,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 920,
-        "y": 360,
-        "wires": [
-            []
-        ]
-    },
-    {
-        "id": "d7150a29cb9ebd5d",
-        "type": "inject",
-        "z": "7e68559fb83a6c0a",
-        "name": "",
-        "props": [
-            {
-                "p": "payload"
-            },
-            {
-                "p": "topic",
-                "vt": "str"
-            }
-        ],
-        "repeat": "",
-        "crontab": "",
-        "once": false,
-        "onceDelay": 0.1,
-        "topic": "",
-        "payload": "",
-        "payloadType": "date",
-        "x": 620,
-        "y": 280,
-        "wires": [
-            [
-                "198c8cce5dcefc2f"
-            ]
-        ]
-    },
-    {
         "id": "684e0fb75ab82082",
         "type": "cronplus",
         "z": "df21a5b106a947a5",
@@ -2154,5 +1963,196 @@
         "x": 840,
         "y": 60,
         "wires": []
+    },
+    {
+        "type": "tab",
+        "label": "Смена/время",
+        "id": "7e68559fb83a6c0a",
+        "info": "",
+        "disabled": false,
+        "env": []
+    },
+    {
+        "id": "df44bd15fd1035b1",
+        "type": "moment",
+        "z": "7e68559fb83a6c0a",
+        "name": "",
+        "topic": "",
+        "input": "payload",
+        "inputType": "msg",
+        "inTz": "Asia/Yekaterinburg",
+        "adjAmount": 0,
+        "adjType": "days",
+        "adjDir": "add",
+        "format": "D MMM HH:mm",
+        "locale": "ru-RU",
+        "output": "payload",
+        "outputType": "msg",
+        "outTz": "Asia/Yekaterinburg",
+        "x": 640,
+        "y": 500,
+        "wires": [
+            [
+                "35b45ec84dcfa0b5"
+            ]
+        ]
+    },
+    {
+        "id": "666fcdacff7783af",
+        "type": "inject",
+        "z": "7e68559fb83a6c0a",
+        "name": "Время сервера",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "10",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 330,
+        "y": 500,
+        "wires": [
+            [
+                "df44bd15fd1035b1"
+            ]
+        ]
+    },
+    {
+        "id": "0ffb7b2d93f5ec64",
+        "type": "websocket out",
+        "z": "7e68559fb83a6c0a",
+        "name": "",
+        "server": "e0707ccdfb3f12e8",
+        "client": "",
+        "x": 1110,
+        "y": 500,
+        "wires": []
+    },
+    {
+        "id": "35b45ec84dcfa0b5",
+        "type": "function",
+        "z": "7e68559fb83a6c0a",
+        "name": "function 4",
+        "func": "msg.payload = {\n    time: msg.payload,\n    stage: global.get('stages').getStage()\n}\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 880,
+        "y": 500,
+        "wires": [
+            [
+                "0ffb7b2d93f5ec64"
+            ]
+        ]
+    },
+    {
+        "id": "e20e5f0e3c3c026b",
+        "type": "function",
+        "z": "7e68559fb83a6c0a",
+        "name": "Смена - дальше",
+        "func": "const stages = global.get('stages')\nstages.nextStage()\n\nreturn msg",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 610,
+        "y": 360,
+        "wires": [
+            [
+                "198c8cce5dcefc2f"
+            ]
+        ]
+    },
+    {
+        "id": "2f1560f4455dfc50",
+        "type": "inject",
+        "z": "7e68559fb83a6c0a",
+        "name": "Таймер дневной смены",
+        "props": [],
+        "repeat": "",
+        "crontab": "00 09 * * *",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 350,
+        "y": 360,
+        "wires": [
+            [
+                "e20e5f0e3c3c026b"
+            ]
+        ]
+    },
+    {
+        "id": "42586db8ab6bdb7a",
+        "type": "inject",
+        "z": "7e68559fb83a6c0a",
+        "name": "Таймер ночной смены",
+        "props": [],
+        "repeat": "",
+        "crontab": "28 12 * * *",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 350,
+        "y": 400,
+        "wires": [
+            [
+                "e20e5f0e3c3c026b"
+            ]
+        ]
+    },
+    {
+        "id": "198c8cce5dcefc2f",
+        "type": "function",
+        "z": "7e68559fb83a6c0a",
+        "name": "Запомнить значения",
+        "func": "const stageProd = {}\nconst devices = global.get('devices') || []\nconst skipedDevs = global.get('skipedDevs')\nconst values = global.get('values')\n\n\ndevices.filter(({ IsRequested }) => IsRequested).forEach((el) => {\n    const id = el.ModbusID\n    if (id in values)    \n    stageProd[id]=values[id].value\n});\n\nglobal.set('stageProduction', stageProd)\n\n//node.warn(stageProd)",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 920,
+        "y": 360,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "d7150a29cb9ebd5d",
+        "type": "inject",
+        "z": "7e68559fb83a6c0a",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 620,
+        "y": 280,
+        "wires": [
+            [
+                "198c8cce5dcefc2f"
+            ]
+        ]
     }
 ]
