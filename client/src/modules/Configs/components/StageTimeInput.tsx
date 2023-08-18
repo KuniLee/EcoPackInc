@@ -38,7 +38,7 @@ export const StageTimeInput: FC = () => {
 
   return (
     <form className="relative mb-6" onSubmit={onSubmit}>
-      <h5>Время начала смен</h5>
+      <h5 className="mb-2">Время начала смен</h5>
       <div className="flex gap-1 [&>div]:min-w-[150px]">
         <TEInput
           label="Начало дневной"

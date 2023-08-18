@@ -25,7 +25,7 @@ export default {
           'accent-100': '#d9e4f3',
           'accent-200': '#cedbee',
         },
-        dark: '#0e210e',
+        dark: '#050e06',
       },
     },
   },
