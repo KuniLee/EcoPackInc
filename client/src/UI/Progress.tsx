@@ -22,9 +22,9 @@ const Progress: FC<ProgressProps> = ({ plan, production }) => {
 
   return (
     <>
-      <div className="w-full bg-neutral-200 rounded overflow-hidden relative">
+      <div className="w-full bg-neutral-200 text-center relative rounded overflow-hidden">
         <div
-          className={cx('min-h-[2em] p-0.5 text-center text-xs font-medium leading-none text-primary-100', {
+          className={cx('p-0.5 absolute h-full text-primary-100', {
             'bg-primary': value >= 100,
             'bg-red-900': value < 30,
             'bg-amber-300': value > 30 && value < 100,
@@ -32,11 +32,11 @@ const Progress: FC<ProgressProps> = ({ plan, production }) => {
           style={{ width: value + '%' }}
         />
         <span
-          className={cx('text-center absolute top-0 left-[50%] translate-x-[-50%]', {
+          className={cx('text-center top-0 left-[50%] translate-x-[-50%]', {
             'text-black': value <= 60,
             'text-current': value > 60,
           })}>
-          {value}%
+          {value + '%'}
         </span>
       </div>
     </>

@@ -30,10 +30,10 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'http://localhost:1880',
+        target: 'http://127.0.0.1:1880',
       },
       '/ws': {
-        target: 'http://localhost:1880',
+        target: 'http://127.0.0.1:1880',
         ws: true,
       },
     },

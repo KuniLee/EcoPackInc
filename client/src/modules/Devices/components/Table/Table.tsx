@@ -36,7 +36,7 @@ const Table: FC<TableProps> = ({ devices, onClick }) => {
               <tbody className="bg-neutral-50">
                 {!devices.length && (
                   <tr>
-                    <td colSpan={4} className="whitespace-nowrap px-6 py-2">
+                    <td colSpan={5} className="whitespace-nowrap px-6 py-2">
                       Нет устройств
                     </td>
                   </tr>

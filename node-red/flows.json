@@ -405,7 +405,7 @@
         "type": "function",
         "z": "6e52c1301b78909b",
         "name": "Поменять местами байты",
-        "func": "const values = global.get('values')\nconst stageProd = global.get('stageProduction')\n\nconst { modbusRequest: { unitid } } = msg\n\nconst buf = msg.payload.buffer.reverse()\n\nfor (let i = 0; i < buf.length; i=i+2) {\n    [buf[i], buf[i + 1]] = [buf[i+1], buf[i]];\n}\n\nconst newValue = buf.readInt32BE(0)\n\nif (values.hasOwnProperty(unitid)) \n    values[unitid].value = buf.readInt32BE(0)\nelse\nvalues[unitid] = {\n        value: newValue,\n    }\n\nif (!(unitid in stageProd)) {\n    stageProd[unitid] = newValue\n}",
+        "func": "const values = global.get('values')\nconst stageProd = global.get('stageProduction', 'file')\n\nconst { modbusRequest: { unitid } } = msg\n\nconst buf = msg.payload.buffer.reverse()\n\nfor (let i = 0; i < buf.length; i=i+2) {\n    [buf[i], buf[i + 1]] = [buf[i+1], buf[i]];\n}\n\nconst newValue = buf.readInt32BE(0)\n\nif (values.hasOwnProperty(unitid)) \n    values[unitid].value = buf.readInt32BE(0)\nelse\nvalues[unitid] = {\n        value: newValue,\n    }\n\nif (!(unitid in stageProd)) {\n    stageProd[unitid] = newValue\n}",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
@@ -644,7 +644,7 @@
         "type": "function",
         "z": "6e52c1301b78909b",
         "name": "function 3",
-        "func": "const devices = global.get('devices') || []\nconst skipedDevs = global.get('skipedDevs')\nconst values = global.get('values')\nconst stageProd = global.get('stageProduction') || {}\n\nconst package = []\n\n\ndevices.forEach(( el )=>{\n\n    const id = el.ModbusID\n    const title = el.Name\n    const screen = el.Screen\n    const plan = el.StagePlan\n    let value = null\n    let performance = null\n    let production = null\n\n    if (id in values){\n        value = values[id]?.value\n        performance = values[id]?.performance\n\n        if (id in stageProd) {\n            const onStageStart = stageProd[id]\n            production = value >= onStageStart ? value - onStageStart : value + 999999 - onStageStart\n        }\n    }\n\n    if (!screen) return\n\n    let status = 'ok'\n\n    if (!el.IsRequested) status = 'disabled'\n    else if (skipedDevs.has(id)) status = 'error'\n\n    package.push({ id, title, screen, status, value, plan, production, performance})   \n\n});\n\nmsg.payload = package\n\nif (package.length) return msg;\n",
+        "func": "const devices = global.get('devices') || []\nconst skipedDevs = global.get('skipedDevs')\nconst values = global.get('values')\nconst stageProd = global.get('stageProduction', 'file') || {}\n\nconst package = []\n\n\ndevices.forEach(( el )=>{\n\n    const id = el.ModbusID\n    const title = el.Name\n    const screen = el.Screen\n    const plan = el.StagePlan\n    let value = null\n    let performance = null\n    let production = null\n\n    if (id in values){\n        value = values[id]?.value\n        performance = values[id]?.performance\n\n        if (id in stageProd) {\n            const onStageStart = stageProd[id]\n            production = value >= onStageStart ? value - onStageStart : value + 999999 - onStageStart\n        }\n    }\n\n    if (!screen) return\n\n    let status = 'ok'\n\n    if (!el.IsRequested) status = 'disabled'\n    else if (skipedDevs.has(id)) status = 'error'\n\n    package.push({ id, title, screen, status, value, plan, production, performance})   \n\n});\n\nmsg.payload = package\n\nif (package.length) return msg;\n",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
@@ -1720,7 +1720,7 @@
         "z": "dc35f1f13fade75e",
         "mydb": "608ff9c050d10945",
         "name": "",
-        "x": 660,
+        "x": 680,
         "y": 300,
         "wires": [
             []
@@ -1735,7 +1735,7 @@
         "fieldType": "msg",
         "format": "handlebars",
         "syntax": "mustache",
-        "template": "SET NAMES utf8mb4;\n\nCREATE TABLE IF NOT EXISTS `ModbusCounters` (\n  `ModbusID` tinyint unsigned NOT NULL COMMENT 'Id модбас устройства',\n  `Name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT 'Отображаемое имя',\n  `IsRequested` bit(1) NOT NULL COMMENT 'Опрашивается или нет',\n  `ValueRegAdr` smallint unsigned NOT NULL DEFAULT '1003' COMMENT 'Адрес регистра текущего значения',\n  `ResetRegAdr` smallint unsigned NOT NULL DEFAULT '1' COMMENT 'Адрес Coil сброса',\n  `StagePlan` mediumint unsigned NULL COMMENT 'План на смену',\n  `Screen` tinyint unsigned NOT NULL COMMENT 'Экран для отображения',\n  PRIMARY KEY (`ModbusID`)\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;\n\nCREATE TABLE IF NOT EXISTS `ArchiveData` (\n  `id` bigint unsigned NOT NULL AUTO_INCREMENT PRIMARY KEY,\n  `dateTime` datetime NOT NULL,\n  `modbusId` tinyint unsigned NOT NULL,\n  `stage` char(1) NULL DEFAULT '',\n  `value` mediumint unsigned NOT NULL\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;",
+        "template": "SET NAMES utf8mb4;\n\nCREATE TABLE IF NOT EXISTS `ModbusCounters` (\n  `ModbusID` tinyint unsigned NOT NULL COMMENT 'Id модбас устройства',\n  `Name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT 'Отображаемое имя',\n  `IsRequested` bit(1) NOT NULL COMMENT 'Опрашивается или нет',\n  `ValueRegAdr` smallint unsigned NOT NULL DEFAULT '1003' COMMENT 'Адрес регистра текущего значения',\n  `ResetRegAdr` smallint unsigned NOT NULL DEFAULT '1' COMMENT 'Адрес Coil сброса',\n  `StagePlan` mediumint unsigned NULL COMMENT 'План на смену',\n  `Screen` tinyint unsigned NOT NULL COMMENT 'Экран для отображения',\n  PRIMARY KEY (`ModbusID`)\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;\n\nCREATE TABLE IF NOT EXISTS `ArchiveData` (\n  `id` bigint unsigned NOT NULL AUTO_INCREMENT,\n  `dateTime` datetime NOT NULL,\n  `modbusId` tinyint unsigned NOT NULL,\n  `name` varchar(50) NOT NULL,\n  `stage` char(1) DEFAULT '',\n  `absValue` mediumint unsigned NOT NULL,\n  `plan` mediumint unsigned DEFAULT NULL,\n  `value` mediumint unsigned DEFAULT NULL,\n  PRIMARY KEY (`id`)\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;",
         "output": "str",
         "x": 460,
         "y": 300,
@@ -1904,7 +1904,7 @@
         "type": "function",
         "z": "df21a5b106a947a5",
         "name": "Сделать запись",
-        "func": "const datetime = msg.payload\nconst devices = global.get('devices') || []\nconst skipedDevs = global.get('skipedDevs')\nconst values = global.get('values')\n\nconst stage = global.get('stages').getStage()\n\nconst query = devices\n    .filter(({ IsRequested, ModbusID }) => IsRequested && ModbusID in values)\n    .reduce((acc, el) => {\n        const id = el.ModbusID\n        const value = values[id]?.value || null\n        acc.push(`INSERT INTO ArchiveData (datetime, modbusId, stage, value) VALUES('${datetime}', ${id}, '${stage}', ${value});`)\n        return acc\n        },[]);\n\nif (query.length === 0) return\n\nmsg.topic = query.join('\\r\\n')\nreturn msg;",
+        "func": "const datetime = msg.payload\nconst devices = global.get('devices') || []\nconst skipedDevs = global.get('skipedDevs')\nconst values = global.get('values')\nconst stageProd = global.get('stageProduction', 'file') || {}\n\n\nconst stage = global.get('stages').getStage()\n\nconst query = devices\n    .filter(({ IsRequested, ModbusID }) => IsRequested && ModbusID in values)\n    .reduce((acc, el) => {\n        const id = el.ModbusID\n        const name = el.Name\n        const absValue = values[id]?.value || 0\n        let plan = null\n        let value = null\n\n        if (id in stageProd) {\n            plan = stageProd[id]\n            value = absValue >= plan ? absValue - plan : absValue + 999999 - plan\n        }\n\n        acc.push(`INSERT INTO ArchiveData (datetime, modbusId, name, stage, absValue, plan, value) VALUES('${datetime}',${id},'${name}','${stage}',${absValue},${plan},${value});`)\n        return acc\n        },[]);\n\nif (query.length === 0) return\n\nmsg.topic = query.join('\\r\\n')\nreturn msg;\n",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
@@ -1936,7 +1936,7 @@
         "output": "payload",
         "outputType": "msg",
         "outTz": "Asia/Yekaterinburg",
-        "x": 700,
+        "x": 680,
         "y": 120,
         "wires": [
             [
@@ -2004,6 +2004,31 @@
         "wires": [
             [
                 "873dda3a08df0990"
+            ]
+        ]
+    },
+    {
+        "id": "516b11021417f278",
+        "type": "inject",
+        "z": "df21a5b106a947a5",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 140,
+        "y": 240,
+        "wires": [
+            [
+                "27d187a9cf0609d3"
             ]
         ]
     },
