@@ -44,14 +44,15 @@ const DeviceForm: FC<DeviceFormProp> = ({ defaultValue, onDelete, onSubmit: onSu
         <TEInput
           className="mt-6"
           type="text"
+          maxLength={40}
           id={'name' + id}
           label="Название"
           defaultValue={defaultValue?.Name}
           {...register('Name', {
             required: 'Введите название',
             maxLength: {
-              value: 50,
-              message: 'Не должно превышать 50 символов',
+              value: 40,
+              message: 'Не должно превышать 40 символов',
             },
           })}>
           <small id={'nameError' + id} className="absolute w-full text-danger-700 dark:text-neutral-200">

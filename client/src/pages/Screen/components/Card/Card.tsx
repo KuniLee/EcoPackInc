@@ -18,17 +18,23 @@ const Card: FC<CardProps> = ({ data: { status, title, plan, production, performa
             'bg-red-900 border-red-600': status === 'error',
           },
           'flex flex-col p-[0.4em] justify-between @[900px]:text-6xl @[600px]:text-5xl @[400px]:text-4xl @[350px]:text-2xl ' +
-            '@[270px]:text-xl aspect-square border-[0.2em] rounded-xl p-2'
+            '@[270px]:text-lg aspect-square border-[0.2em] rounded-xl p-2'
         )}>
         <h5 className="text-center leading-none text-[1em]">{title}</h5>
-        <Progress plan={plan} production={production} />
+        <div className="flex mt-1 flex-col">
+          <Progress plan={plan} production={production} />
+          <span className="leading-none text-[1em] mt-1 text-end">
+            План:{plan === null || plan === undefined ? '----' : plan}
+          </span>
+        </div>
+
         <div className="flex flex-col">
-          <span className="mb-2 leading-none text-[0.75em]">За смену: </span>
-          <span className="mb-2 leading-none @[900px]:text-[4em] @[400px]:text-[3em] text-[3.5em] self-center">
+          <span className="mb-1 @[400px]:mb-2 leading-none text-[0.75em]">За смену: </span>
+          <span className="mb-1 @[400px]:mb-2 leading-none @[900px]:text-[4em] @[400px]:text-[3em] text-[3.5em] self-center">
             {production === null || production === undefined ? '----' : production}
           </span>
-          <span className="mb-2 leading-none text-[0.75em]">Производительность (шт/мин):</span>
-          <span className="text-[3.2em] leading-none @[900px]:text-[4em] @[400px]:text-[3em] self-center">
+          <span className="mb-1 @[400px]:mb-2 leading-none text-[0.75em]">Производительность (шт/мин):</span>
+          <span className="text-[3em] leading-none @[900px]:text-[4em] @[400px]:text-[3em] self-center">
             {performance === null || performance === undefined ? '----' : performance}
           </span>
         </div>

@@ -9,12 +9,12 @@ type ProgressProps = {
 }
 
 const Progress: FC<ProgressProps> = ({ plan, production }) => {
-  const [value, setValue] = useState(0)
+  const [percent, setPercent] = useState(0)
 
   useEffect(() => {
     if (!isNull(plan) && !isNull(production)) {
-      if (plan <= 0) setValue(100)
-      else setValue(Math.round((production / plan) * 100))
+      if (plan <= 0) setPercent(100)
+      else setPercent(Math.round((production / plan) * 100))
     }
   }, [production, plan])
 
@@ -25,18 +25,18 @@ const Progress: FC<ProgressProps> = ({ plan, production }) => {
       <div className="w-full bg-neutral-200 text-center relative rounded overflow-hidden">
         <div
           className={cx('p-0.5 absolute h-full text-primary-100', {
-            'bg-primary': value >= 100,
-            'bg-red-900': value < 30,
-            'bg-amber-300': value > 30 && value < 100,
+            'bg-primary': percent >= 100,
+            'bg-red-900': percent < 30,
+            'bg-amber-300': percent > 30 && percent < 100,
           })}
-          style={{ width: value + '%' }}
+          style={{ width: (percent < 100 ? percent : 100) + '%' }}
         />
         <span
-          className={cx('text-center top-0 left-[50%] translate-x-[-50%]', {
-            'text-black': value <= 60,
-            'text-current': value > 60,
+          className={cx('text-center relative', {
+            'text-black': percent <= 60,
+            'text-current': percent > 60,
           })}>
-          {value + '%'}
+          {percent + '%'}
         </span>
       </div>
     </>
