@@ -78,6 +78,7 @@
         "id": "608ff9c050d10945",
         "type": "MySQLdatabase",
         "name": "mysql-db",
+        "host": "127.0.0.1",
         "port": "3306",
         "db": "DataBase",
         "tz": "",
@@ -125,7 +126,7 @@
         "type": "function",
         "z": "d8f388f98592d062",
         "name": "Инициализация Global",
-        "func": "global.get('MODBUS_TCP_IP', 'file') || global.set('MODBUS_TCP_IP', '127.0.0.1', 'file')\nglobal.get('ATTEMPTS', 'file') || global.set('ATTEMPTS', 3, 'file')\nglobal.get('ERROR_TIME', 'file') || global.set('ERROR_TIME', 10000, 'file')\nglobal.get('STAGE_TIME', 'file') || global.set('STAGE_TIME', ['09:00','21:00','A'], 'file')\n\nglobal.get('stageProduction') || global.set('stageProduction', {})\n",
+        "func": "global.get('MODBUS_TCP_IP', 'file') || global.set('MODBUS_TCP_IP', '127.0.0.1', 'file')\nglobal.get('ATTEMPTS', 'file') || global.set('ATTEMPTS', 3, 'file')\nglobal.get('ERROR_TIME', 'file') || global.set('ERROR_TIME', 10000, 'file')\nglobal.get('STAGE_TIME', 'file') || global.set('STAGE_TIME', ['09:00','21:00','A'], 'file')\nglobal.get('stageProduction', 'file') || global.set('stageProduction', {}, 'file')",
         "outputs": 0,
         "noerr": 0,
         "initialize": "",
@@ -266,10 +267,10 @@
         "type": "function",
         "z": "d8f388f98592d062",
         "name": "Установить смену",
-        "func": "const stagesCycle = global.get('stages')\nconst [time1,time2,stage] = global.get('STAGE_TIME', 'file')\n\nconst currentD = new Date();\nvar startDayStage = new Date();\n// @ts-ignore\nstartDayStage.setHours(...time1.split(':'), 0);\nvar endDayStage = new Date();\n// @ts-ignore\nendDayStage.setHours(...time2.split(':'), 0);\n\nconst isDay = currentD >= startDayStage && currentD < endDayStage\n\nstagesCycle.setStage(stage, isDay)\n\nmsg.url = 'http://127.0.0.1:1880/flow/7e68559fb83a6c0a'\nreturn msg",
+        "func": "const stagesCycle = global.get('stages')\nconst [time1,time2,stage] = global.get('STAGE_TIME', 'file')\n\nconst currentD = new Date();\nvar startDayStage = new Date();\n// @ts-ignore\nstartDayStage.setHours(...time1.split(':'), 0);\nvar endDayStage = new Date();\n// @ts-ignore\nendDayStage.setHours(...time2.split(':'), 0);\n\nconst isDay = currentD >= startDayStage && currentD < endDayStage\n\nstagesCycle.setStage(stage, isDay)\n\n\n// установка времени следующей смены\nconst nextStageIn = global.get('nextStageIn', 'file')\nif (nextStageIn) {\n    if (new Date(nextStageIn) <= new Date()) global.set('stageProduction', {}, 'file')\n} else global.set('nextStageIn', stagesCycle.getStageEndTime(), 'file')\n\n\nmsg.url = 'http://127.0.0.1:1880/flow/7e68559fb83a6c0a'\nreturn msg",
         "outputs": 1,
         "noerr": 0,
-        "initialize": "// Добавленный здесь код будет исполняться\n// однократно при развертывании узла.\n\nclass StageCycle {\n    #stages = ['A','B','C','A','D','C','B','D']\n    current = 0\n\n    setStage(stage, isDay){\n        this.current = this.#stages.findIndex((el, idx) => el === stage && idx % 2 !== (+isDay) )\n        this.setGlobal()\n    }\n\n    setGlobal(){\n        const stageTime = global.get('STAGE_TIME', 'file')\n        stageTime[2] = this.getStage()\n        global.set('STAGE_TIME', stageTime, 'file')\n    }\n    \n    getStage(){\n        return this.#stages[this.current]\n    }\n\n    nextStage() {\n        if (this.current < this.#stages.length - 1)\n        this.current++\n        else this.current = 0\n        this.setGlobal()\n    }\n}\n\nglobal.set('stages', new StageCycle())",
+        "initialize": "// Добавленный здесь код будет исполняться\n// однократно при развертывании узла.\n\nclass StageCycle {\n    #stages = ['A','B','C','A','D','C','B','D']\n    current = 0\n\n    setStage(stage, isDay){\n        this.current = this.#stages.findIndex((el, idx) => el === stage && idx % 2 !== (+isDay) )\n        this.setGlobal()\n    }\n\n    setGlobal(){\n        const stageTime = global.get('STAGE_TIME', 'file')\n        stageTime[2] = this.getStage()\n        global.set('STAGE_TIME', stageTime, 'file')\n    }\n    \n    getStage(){\n        return this.#stages[this.current]\n    }\n\n    nextStage() {\n        if (this.current < this.#stages.length - 1)\n        this.current++\n        else this.current = 0\n        this.setGlobal()\n    }\n\n    getStageEndTime(){\n    const [startDay, startNight] = global.get('STAGE_TIME', 'file')\n    const currentD = new Date();\n    const startStageTime = this.current % 2 === 0 ? startNight : startDay\n\n    // @ts-ignore\n    currentD.setHours(...startStageTime.split(':'), 0)\n    return currentD.getTime();\n    }\n}\n\nglobal.set('stages', new StageCycle())",
         "finalize": "",
         "libs": [],
         "x": 490,
@@ -1909,7 +1910,7 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1000,
+        "x": 940,
         "y": 120,
         "wires": [
             [
@@ -2101,13 +2102,13 @@
         "type": "function",
         "z": "7e68559fb83a6c0a",
         "name": "Смена - дальше",
-        "func": "const stages = global.get('stages')\nstages.nextStage()\n\nreturn msg",
+        "func": "const stages = global.get('stages')\nstages.nextStage()\nglobal.set('nextStageIn', stages.getStageEndTime(), 'file')\n\nreturn msg",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 610,
+        "x": 650,
         "y": 360,
         "wires": [
             [
@@ -2122,7 +2123,7 @@
         "name": "Таймер дневной смены",
         "props": [],
         "repeat": "",
-        "crontab": "00 09 * * *",
+        "crontab": "13 14 * * *",
         "once": false,
         "onceDelay": 0.1,
         "topic": "",
@@ -2141,7 +2142,7 @@
         "name": "Таймер ночной смены",
         "props": [],
         "repeat": "",
-        "crontab": "28 12 * * *",
+        "crontab": "00 21 * * *",
         "once": false,
         "onceDelay": 0.1,
         "topic": "",
@@ -2158,7 +2159,7 @@
         "type": "function",
         "z": "7e68559fb83a6c0a",
         "name": "Запомнить значения",
-        "func": "const stageProd = {}\nconst devices = global.get('devices') || []\nconst skipedDevs = global.get('skipedDevs')\nconst values = global.get('values')\n\n\ndevices.filter(({ IsRequested }) => IsRequested).forEach((el) => {\n    const id = el.ModbusID\n    if (id in values)    \n    stageProd[id]=values[id].value\n});\n\nglobal.set('stageProduction', stageProd)\n\n//node.warn(stageProd)",
+        "func": "const stageProd = {}\nconst devices = global.get('devices') || []\nconst skipedDevs = global.get('skipedDevs')\nconst values = global.get('values')\n\n\ndevices.filter(({ IsRequested }) => IsRequested).forEach((el) => {\n    const id = el.ModbusID\n    if (id in values)    \n    stageProd[id]=values[id].value\n});\n\nglobal.set('stageProduction', stageProd, 'file')\n\n//node.warn(stageProd)",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
@@ -2168,35 +2169,6 @@
         "y": 360,
         "wires": [
             []
-        ]
-    },
-    {
-        "id": "d7150a29cb9ebd5d",
-        "type": "inject",
-        "z": "7e68559fb83a6c0a",
-        "name": "",
-        "props": [
-            {
-                "p": "payload"
-            },
-            {
-                "p": "topic",
-                "vt": "str"
-            }
-        ],
-        "repeat": "",
-        "crontab": "",
-        "once": false,
-        "onceDelay": 0.1,
-        "topic": "",
-        "payload": "",
-        "payloadType": "date",
-        "x": 620,
-        "y": 280,
-        "wires": [
-            [
-                "198c8cce5dcefc2f"
-            ]
         ]
     }
 ]
