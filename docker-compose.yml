@@ -67,3 +67,5 @@ services:
     image: kunilee/swagger-ui:latest
     restart: always
     container_name: swagger-ui
+    ports:
+      - 8000:8080
