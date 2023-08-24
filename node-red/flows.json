@@ -125,7 +125,7 @@
         "type": "function",
         "z": "d8f388f98592d062",
         "name": "Инициализация Global",
-        "func": "global.get('MODBUS_TCP_IP', 'file') || global.set('MODBUS_TCP_IP', '127.0.0.1', 'file')\nglobal.get('ATTEMPTS', 'file') || global.set('ATTEMPTS', 3, 'file')\nglobal.get('ERROR_TIME', 'file') || global.set('ERROR_TIME', 10000, 'file')\nglobal.get('STAGE_TIME', 'file') || global.set('STAGE_TIME', ['09:00','21:00','A'], 'file')\nglobal.get('stageProduction', 'file') || global.set('stageProduction', {}, 'file')",
+        "func": "global.get('MODBUS_TCP_IP', 'file') || global.set('MODBUS_TCP_IP', '127.0.0.1', 'file')\nglobal.get('ATTEMPTS', 'file') || global.set('ATTEMPTS', 3, 'file')\nglobal.get('ERROR_TIME', 'file') || global.set('ERROR_TIME', 10000, 'file')\nglobal.get('STAGE_TIME', 'file') || global.set('STAGE_TIME', ['09:00','21:00','A'], 'file')\nglobal.get('stageProduction', 'file') || global.set('stageProduction', {}, 'file')\nglobal.get('settingsPagePassword', 'file') || global.set('settingsPagePassword', 'eco', 'file')",
         "outputs": 0,
         "noerr": 0,
         "initialize": "",
@@ -893,17 +893,6 @@
                 "78ec0b97e374799a"
             ]
         ]
-    },
-    {
-        "id": "266c286f.d993d8",
-        "type": "http response",
-        "z": "f8267d55bb8665c3",
-        "name": "",
-        "statusCode": "200",
-        "headers": {},
-        "x": 1240,
-        "y": 120,
-        "wires": []
     },
     {
         "id": "bcf0258362e4a423",
@@ -1689,6 +1678,82 @@
         "wires": []
     },
     {
+        "id": "094947a94e5326c9",
+        "type": "http in",
+        "z": "f8267d55bb8665c3",
+        "name": "",
+        "url": "/api/password",
+        "method": "post",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 150,
+        "y": 1000,
+        "wires": [
+            [
+                "dbce9f3f09957a4d",
+                "9accb1e518daf1e5"
+            ]
+        ]
+    },
+    {
+        "id": "dbce9f3f09957a4d",
+        "type": "function",
+        "z": "f8267d55bb8665c3",
+        "name": "Проверка",
+        "func": "const rightPassword = global.get('settingsPagePassword', 'file') \nconst reqBody = msg.req.body\n\nif ('password' in reqBody)\nnode.warn(reqBody.password);\n\nmsg.statusCode = (reqBody.password === rightPassword) ? 200 : 403\nreturn msg",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 360,
+        "y": 1000,
+        "wires": [
+            [
+                "43564ed009568e3b"
+            ]
+        ]
+    },
+    {
+        "id": "9accb1e518daf1e5",
+        "type": "debug",
+        "z": "f8267d55bb8665c3",
+        "name": "debug 5",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 280,
+        "y": 940,
+        "wires": []
+    },
+    {
+        "id": "266c286f.d993d8",
+        "type": "http response",
+        "z": "f8267d55bb8665c3",
+        "name": "",
+        "statusCode": "200",
+        "headers": {},
+        "x": 1240,
+        "y": 120,
+        "wires": []
+    },
+    {
+        "id": "43564ed009568e3b",
+        "type": "http response",
+        "z": "f8267d55bb8665c3",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 530,
+        "y": 1000,
+        "wires": []
+    },
+    {
         "id": "39dd64a2.77696c",
         "type": "inject",
         "z": "dc35f1f13fade75e",
@@ -2166,7 +2231,7 @@
         "name": "Таймер ночной смены",
         "props": [],
         "repeat": "",
-        "crontab": "28 12 * * *",
+        "crontab": "00 21 * * *",
         "once": false,
         "onceDelay": 0.1,
         "topic": "",
