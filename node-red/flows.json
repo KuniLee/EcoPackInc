@@ -266,10 +266,10 @@
         "type": "function",
         "z": "d8f388f98592d062",
         "name": "Установить смену",
-        "func": "const stagesCycle = global.get('stages')\nconst [time1,time2,stage] = global.get('STAGE_TIME', 'file')\n\nconst currentD = new Date();\nvar startDayStage = new Date();\n// @ts-ignore\nstartDayStage.setHours(...time1.split(':'), 0);\nvar endDayStage = new Date();\n// @ts-ignore\nendDayStage.setHours(...time2.split(':'), 0);\n\nconst isDay = currentD >= startDayStage && currentD < endDayStage\n\nstagesCycle.setStage(stage, isDay)\n\n\n// установка времени следующей смены\nconst nextStageIn = global.get('nextStageIn', 'file')\nif (nextStageIn) {\n    if (new Date(nextStageIn) <= new Date()) global.set('stageProduction', {}, 'file')\n} else global.set('nextStageIn', stagesCycle.getStageEndTime(), 'file')\n\n\nmsg.url = 'http://127.0.0.1:1880/flow/7e68559fb83a6c0a'\nreturn msg",
+        "func": "const stagesCycle = global.get('stages')\nconst [time1,time2,stage] = global.get('STAGE_TIME', 'file')\n\nconst currentD = new Date();\nvar startDayStage = new Date();\n// @ts-ignore\nstartDayStage.setHours(...time1.split(':'), 0);\nvar endDayStage = new Date();\n// @ts-ignore\nendDayStage.setHours(...time2.split(':'), 0);\n\nconst isDay = currentD >= startDayStage && currentD < endDayStage\n\nstagesCycle.setStage(stage, isDay)\n\n\n// установка времени следующей смены\nconst nextStageIn = global.get('nextStageIn', 'file')\nif (nextStageIn) {\n    if (new Date(nextStageIn) <= new Date()) {\n        global.set('stageProduction', {}, 'file')\n        global.set('nextStageIn', stagesCycle.getStageEndTime(), 'file')\n    }\n} else global.set('nextStageIn', stagesCycle.getStageEndTime(), 'file')\n\n\nmsg.url = 'http://127.0.0.1:1880/flow/7e68559fb83a6c0a'\nreturn msg",
         "outputs": 1,
         "noerr": 0,
-        "initialize": "// Добавленный здесь код будет исполняться\n// однократно при развертывании узла.\n\nclass StageCycle {\n    #stages = ['A','B','C','A','D','C','B','D']\n    current = 0\n\n    setStage(stage, isDay){\n        this.current = this.#stages.findIndex((el, idx) => el === stage && idx % 2 !== (+isDay) )\n        this.setGlobal()\n    }\n\n    setGlobal(){\n        const stageTime = global.get('STAGE_TIME', 'file')\n        stageTime[2] = this.getStage()\n        global.set('STAGE_TIME', stageTime, 'file')\n    }\n    \n    getStage(){\n        return this.#stages[this.current]\n    }\n\n    nextStage() {\n        if (this.current < this.#stages.length - 1)\n        this.current++\n        else this.current = 0\n        this.setGlobal()\n    }\n\n    getStageEndTime(){\n    const [startDay, startNight] = global.get('STAGE_TIME', 'file')\n    const currentD = new Date();\n    const startStageTime = this.current % 2 === 0 ? startNight : startDay\n\n    // @ts-ignore\n    currentD.setHours(...startStageTime.split(':'), 0)\n    return currentD.getTime();\n    }\n}\n\nglobal.set('stages', new StageCycle())",
+        "initialize": "// Добавленный здесь код будет исполняться\n// однократно при развертывании узла.\n\nclass StageCycle {\n    #stages = ['A','B','C','A','D','C','B','D']\n    current = 0\n\n    setStage(stage, isDay){\n        this.current = this.#stages.findIndex((el, idx) => el === stage && idx % 2 !== (+isDay) )\n        this.setGlobal()\n    }\n\n    setGlobal(){\n        const stageTime = global.get('STAGE_TIME', 'file')\n        stageTime[2] = this.getStage()\n        global.set('STAGE_TIME', stageTime, 'file')\n    }\n    \n    getStage(){\n        return this.#stages[this.current]\n    }\n\n    nextStage() {\n        if (this.current < this.#stages.length - 1)\n        this.current++\n        else this.current = 0\n        this.setGlobal()\n    }\n\n    getStageEndTime(){\n    const [startDay, startNight] = global.get('STAGE_TIME', 'file')\n    const currentD = new Date();\n\n    const startStageTime = this.current % 2 === 0 ? startNight : startDay\n\n    // @ts-ignore\n    currentD.setHours(...startStageTime.split(':'), 0)\n\n        if (new Date() >= currentD) currentD.setDate(currentD.getDate() + 1);\n    \n    return currentD.getTime();\n    }\n}\n\nglobal.set('stages', new StageCycle())",
         "finalize": "",
         "libs": [],
         "x": 490,
@@ -1509,7 +1509,7 @@
         "z": "f8267d55bb8665c3",
         "name": "",
         "scope": [
-            "b4fb70fbe6dc33de"
+            "c0cd52030be91ae7"
         ],
         "uncaught": false,
         "x": 740,
@@ -1550,7 +1550,8 @@
         "y": 840,
         "wires": [
             [
-                "4223c9348cacbd7a"
+                "4223c9348cacbd7a",
+                "395fd8f5c69c18fa"
             ]
         ]
     },
@@ -1559,7 +1560,7 @@
         "type": "function",
         "z": "f8267d55bb8665c3",
         "name": "Проверка",
-        "func": "const upSettings = Object.entries(msg.payload)\nconst oldSettings = global.keys('file')\n\nconst updated = {}\n\nupSettings.forEach(([key, newValue]) => {\n   if (oldSettings.includes(key) && global.get(key, 'file') !== newValue) {\n       global.set(key, newValue, 'file')\n       updated[key] = newValue\n   }\n})\n\n\nmsg.payload = updated\n\nmsg.headers = {\n    'content-type': 'application/json'\n}\n\n\nreturn msg;",
+        "func": "const upSettings = Object.entries(msg.payload)\nconst oldSettings = global.keys('file')\n\nconst updated = {}\n\nupSettings.forEach(([key, newValue]) => {\n   if (oldSettings.includes(key) && global.get(key, 'file') !== newValue) {\n       global.set(key, newValue, 'file')\n       updated[key] = newValue\n   } else {\n       throw new Error(`Такого свойства несуществует: ${key}`)\n       }\n})\n\n\nmsg.payload = updated\n\nmsg.headers = {\n    'content-type': 'application/json'\n}\n\n\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
@@ -1665,7 +1666,7 @@
         "type": "debug",
         "z": "f8267d55bb8665c3",
         "name": "debug 4",
-        "active": false,
+        "active": true,
         "tosidebar": true,
         "console": false,
         "tostatus": false,
@@ -1751,6 +1752,23 @@
         "headers": {},
         "x": 530,
         "y": 1000,
+        "wires": []
+    },
+    {
+        "id": "395fd8f5c69c18fa",
+        "type": "debug",
+        "z": "f8267d55bb8665c3",
+        "name": "debug 6",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1140,
+        "y": 880,
         "wires": []
     },
     {
@@ -2231,7 +2249,7 @@
         "name": "Таймер ночной смены",
         "props": [],
         "repeat": "",
-        "crontab": "00 21 * * *",
+        "crontab": "00 16 * * *",
         "once": false,
         "onceDelay": 0.1,
         "topic": "",
