@@ -21,7 +21,7 @@ export type DeviceConfig = {
   Screen: number
 }
 
-export const StageLetters = ['A', 'B', 'C', 'D'] as const
+export const StageLetters = ['A', 'B', 'C', 'D', 'X'] as const
 export type StageLettersType = (typeof StageLetters)[number]
 
 export type Configs = {
