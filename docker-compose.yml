@@ -9,7 +9,7 @@ services:
       - WATCHTOWER_CLEANUP=true
       - WATCHTOWER_NOTIFICATIONS=shoutrrr
       - WATCHTOWER_NOTIFICATION_URL=telegram://1724826386:AAGeFEhps8_0H1vJLOxa9Yy8i3Fr5XZ30Gk@telegram/?channels=373334037
-    command: --interval 30 nginx node-red
+    command: --interval 30 nginx node-red swagger-ui
     volumes:
       - '/var/run/docker.sock:/var/run/docker.sock'
     image: containrrr/watchtower
@@ -31,7 +31,7 @@ services:
       - "1880:1880"
     tty: true
     environment:
-      TZ: Asia/Yekaterinburg
+      TZ: ${TZ}
       MYSQL_IP: ${MYSQL_IP_ENV}
     volumes:
       - ./settings:/data/context/global
@@ -47,6 +47,7 @@ services:
       MYSQL_DATABASE: ${MYSQL_DATABASE}
       MYSQL_USER: ${MYSQL_USER}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      TZ: ${TZ}
     volumes:
       - ./dbdata:/var/lib/mysql/
 
@@ -61,3 +62,10 @@ services:
     environment:
       ADMINER_DESIGN: pappu687
       ADMINER_DEFAULT_SERVER: mysql
+
+  swagger-ui:
+    image: kunilee/swagger-ui:latest
+    restart: always
+    container_name: swagger-ui
+    ports:
+      - 8000:8080

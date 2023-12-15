@@ -10,6 +10,7 @@
 @tailwind utilities;
 
 @font-face {
-    font-family: "JetBrains Mono";
-    src: url("../assets/fonts/JetBrainsMono-Regular.ttf");
+    font-family: 'JetBrains Mono';
+    src: url('../assets/fonts/JetBrainsMono-Regular.eot') format('embedded-opentype'),
+    url('../assets/fonts/JetBrainsMono-Regular.ttf')  format('truetype');
 }

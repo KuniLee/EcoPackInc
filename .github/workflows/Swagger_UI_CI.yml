@@ -1,9 +1,9 @@
-name: NodeRed_CI
+name: Swagger_CI
 on:
   push:
     branches: ["develop"]
     paths:
-      - 'node-red/**'
+      - 'swagger/**'
 
   workflow_dispatch:
 
@@ -24,7 +24,6 @@ jobs:
       - name: Build and push Docker image
         uses: docker/build-push-action@v4
         with:
-          context: ./node-red
-          file: ./node-red/Dockerfile
+          context: ./swagger
           push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/node-red:latest
+          tags: ${{ secrets.DOCKER_USERNAME }}/swagger-ui:latest

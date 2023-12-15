@@ -498,6 +498,9 @@ module.exports = {
     /** Retry time in milliseconds for Serial port connections */
     serialReconnectTime: 15000,
 
+    /** Retry time in milliseconds for MySQL */
+    mysqlReconnectTime:10000
+
     /** Retry time in milliseconds for TCP socket connections */
     //socketReconnectTime: 10000,
 

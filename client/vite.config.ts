@@ -3,6 +3,8 @@ import react from '@vitejs/plugin-react'
 import eslint from 'vite-plugin-eslint'
 import path from 'path'
 import svgr from 'vite-plugin-svgr'
+import lightningcss from 'vite-plugin-lightningcss'
+import legacy from '@vitejs/plugin-legacy'
 
 const viteEnv: { [key: string]: string } = {}
 
@@ -13,7 +15,29 @@ Object.keys(process.env).forEach((key) => {
 })
 
 export default defineConfig({
-  plugins: [react(), eslint(), svgr()],
+  plugins: [
+    react(),
+    legacy({
+      targets: ['>0.2%', 'chrome > 38', 'dead'],
+    }),
+    eslint(),
+    svgr(),
+    lightningcss({
+      minify: true,
+      browserslist: ['>0.2%', 'chrome > 38', 'dead'],
+    }),
+  ],
+  server: {
+    proxy: {
+      '/api': {
+        target: 'http://127.0.0.1:1880',
+      },
+      '/ws': {
+        target: 'http://127.0.0.1:1880',
+        ws: true,
+      },
+    },
+  },
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),

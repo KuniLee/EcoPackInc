@@ -1,0 +1,261 @@
+openapi: 3.1.0
+info:
+  title: Eco Package Incorporated табло учёта
+  version: 1.0.0
+externalDocs:
+  description: Исходный код
+  url: https://github.com/KuniLee/EcoPackInc
+servers:
+  - url: http://localhost:1880/api/
+    description: Dev Server
+tags:
+  - name: devices
+    description: Modbus устройства
+  - name: settings
+    description: Настройки
+  - name: others
+    description: Другое
+paths:
+  /devices:
+    get:
+      tags:
+        - devices
+      summary: Получить все счётчики
+      description: Предоставляет массив всех счётчиков
+      responses:
+        '200':
+          description: Успешно
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Device'
+    post:
+      tags:
+        - devices
+      summary: Добавляет новый счётчик
+      description: Добавляет новый счётчик
+      requestBody:
+        description: Добавляет новый счётчик
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Device'
+        required: true
+      responses:
+        '201':
+          description: Успешно добавлен
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Device'
+        '400':
+          description: Error Bad request
+  /device/{modbusID}:
+    put:
+      tags:
+        - devices
+      summary: Добавить или изменить счётчик
+      description: Добавляет новый счётчик или изменяет существующий
+      parameters:
+        - name: modbusID
+          in: path
+          description: Адрес Modbus устройства
+          required: true
+          schema:
+            type: integer
+            format: int64
+            minimum: 1
+            maximum: 255
+      requestBody:
+        description: Update an existent user in the store
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Device'
+      responses:
+        '200':
+          description: Успешно добавлен/изменен
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Device'
+        '400':
+          description: Invalid status value
+    delete:
+      tags:
+        - devices
+      summary: Удалить счётчик
+      description: Удаляет счётчик
+      parameters:
+        - name: modbusID
+          in: path
+          description: Адрес Modbus устройства
+          required: true
+          schema:
+            type: integer
+            format: int64
+            minimum: 1
+            maximum: 255
+      responses:
+        '204':
+          description: Успешно удален
+        '400':
+          description: Invalid status value
+  /settings:
+    get:
+      tags:
+        - settings
+      summary: Получить все переменные настроек
+      responses:
+        '200':
+          description: Успешно
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Settings'
+        '400':
+          description: Invalid tag value
+    put:
+      tags:
+        - settings
+      summary: Изменить настройки
+      description: Позволяет изменить все или некоторые переменные настроек
+      requestBody: 
+         content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Settings'
+            examples:
+              MODBUS_API:
+                summary: Пример изменения адреса Modbus TCP
+                value:
+                  MODBUS_TCP_IP: 192.168.1.100
+              password:
+                summary: Пример изменения пароля для доступа к окну настроек
+                value:
+                  settingsPagePassword: newpass
+      responses:
+        '200':
+          description: В теле ответа новое значение
+          content:
+            application/json:
+              example: {"MODBUS_TCP_IP": "127.0.0.2"}
+        '500':
+          description: Неверное свойство
+          content:
+            application/json:
+              example: 
+                message: "Error: Такого свойства несуществует: key"
+                source: 
+                  id: c0cd52030be91ae7,
+                  type: function,
+                  name: Проверка,
+                  count: 1
+  /password:
+    post:
+      tags:
+        - others
+      summary: Проверка введённого пароля
+      requestBody: 
+         content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                password:
+                  type: string
+                  examples: ['eco']
+      responses:
+        '200':
+          description: Пароль верный
+          content:
+            application/json:
+              example: 
+                password: eco
+        '403':
+          description: Неверный пароль
+          content:
+            application/json:
+              example: 
+                password: incorrect password
+components:
+  schemas:
+    Device:
+      type: object
+      properties:
+        ModbusID:
+          type: integer
+          format: int32
+          examples: [1,2]
+          minimum: 1
+          maximum: 255
+        IsRequested:
+          type: boolean
+          examples: [true, false]
+          description: Опрашивается ли счётчик?
+        Name:
+          type: string
+          maxLength: 50
+          examples: ["Станок №1"]
+        ResetRegAdr:
+          type: integer
+          format: int32
+          examples: [1]
+          description: Регистр сброса счётчика
+        ValueRegAdr:
+          type: integer
+          format: int32
+          examples: [1003]
+          description: Регистр значения
+        Screen:
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 10
+          examples: [1,2]
+          description: Номер экрана для отображения
+        StagePlan:
+          type: integer
+          format: int32
+          description: План на смену
+          examples: [null, undefined, 10000]
+    Settings:
+      type: object
+      properties:
+        MODBUS_TCP_IP: 
+          type: string
+          examples: ["127.0.0.1"]
+          description: IP адрес или доменное имя MODBUS TCP устройства
+        ATTEMPTS: 
+          type: integer
+          format: int32
+          examples: [3,4]
+          description: Колличество попыток опросить устройство, прежде чем исключить его из опроса
+        ERROR_TIME: 
+          type: integer
+          format: int32
+          examples: [10000,20000]
+          description: Период опроса недоступных(исключенных) устройств (мс)
+        STAGE_TIME: 
+          $ref: '#/components/schemas/STAGE_TIME'
+        nextStageIn: 
+          type: integer
+          format: int32
+          examples: [1692676800002]
+          description: timestamp начала следующей смены
+        settingsPagePassword: 
+          type: string
+          examples: [eco]
+          description: Пароль для доступа к странице настроек
+        stageProduction: 
+          type: object
+          examples: [{"1": 2,"2": 50,"3": 45,"4": 7,"5": 20,"6": 44}]
+          description: Сколько произведено в текщей смене для каждого счётчика
+    STAGE_TIME:
+      type: array
+      items: 
+        type: string
+      examples: [["09:00", "12:28", "A"]]
+      description: '[время начала дневной смены, время начала ночной смены, текущая смена]'

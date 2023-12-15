@@ -32,6 +32,14 @@
         "env": []
     },
     {
+        "id": "df21a5b106a947a5",
+        "type": "tab",
+        "label": "Архивация",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
         "id": "7e68559fb83a6c0a",
         "type": "tab",
         "label": "Смена/время",
@@ -70,7 +78,6 @@
         "id": "608ff9c050d10945",
         "type": "MySQLdatabase",
         "name": "mysql-db",
-        "host": "127.0.0.1",
         "port": "3306",
         "db": "DataBase",
         "tz": "",
@@ -118,7 +125,7 @@
         "type": "function",
         "z": "d8f388f98592d062",
         "name": "Инициализация Global",
-        "func": "global.get('MODBUS_TCP_IP', 'file') || global.set('MODBUS_TCP_IP', '127.0.0.1', 'file')\nglobal.get('ATTEMPTS', 'file') || global.set('ATTEMPTS', 3, 'file')\nglobal.get('ERROR_TIME', 'file') || global.set('ERROR_TIME', 10000, 'file')\nglobal.get('STAGE_TIME', 'file') || global.set('STAGE_TIME', ['09:00','21:00','A'], 'file')",
+        "func": "global.get('MODBUS_TCP_IP', 'file') || global.set('MODBUS_TCP_IP', '127.0.0.1', 'file')\nglobal.get('ATTEMPTS', 'file') || global.set('ATTEMPTS', 3, 'file')\nglobal.get('ERROR_TIME', 'file') || global.set('ERROR_TIME', 10000, 'file')\nglobal.get('STAGE_TIME', 'file') || global.set('STAGE_TIME', ['09:00','21:00','X'], 'file')\nglobal.get('stageProduction', 'file') || global.set('stageProduction', {}, 'file')\nglobal.get('settingsPagePassword', 'file') || global.set('settingsPagePassword', 'eco', 'file')",
         "outputs": 0,
         "noerr": 0,
         "initialize": "",
@@ -153,7 +160,7 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1030,
+        "x": 1070,
         "y": 260,
         "wires": [
             []
@@ -177,7 +184,7 @@
         "links": [
             "3b36fa04cce40f0c"
         ],
-        "x": 315,
+        "x": 305,
         "y": 340,
         "wires": [
             [
@@ -249,7 +256,8 @@
         "y": 260,
         "wires": [
             [
-                "d43fee0fedd81d84"
+                "d43fee0fedd81d84",
+                "c4b7301bcd14a36f"
             ]
         ]
     },
@@ -258,10 +266,10 @@
         "type": "function",
         "z": "d8f388f98592d062",
         "name": "Установить смену",
-        "func": "const stagesCycle = global.get('stages')\nconst [time1,time2,stage] = global.get('STAGE_TIME', 'file')\n\nconst currentD = new Date();\nvar startDayStage = new Date();\n// @ts-ignore\nstartDayStage.setHours(...time1.split(':'), 0);\nvar endDayStage = new Date();\n// @ts-ignore\nendDayStage.setHours(...time2.split(':'), 0);\n\nconst isDay = currentD >= startDayStage && currentD < endDayStage\n\nstagesCycle.setStage(stage, isDay)\n\nmsg.url = 'http://127.0.0.1:1880/flow/7e68559fb83a6c0a'\nreturn msg",
+        "func": "const stagesCycle = global.get('stages')\nconst [time1,time2,stage] = global.get('STAGE_TIME', 'file')\n\nmsg.url = 'http://127.0.0.1:1880/flow/7e68559fb83a6c0a'\n\nif (stage === 'X'){\n    global.set('nextStageIn', undefined, 'file')\n    stagesCycle.setStage(\"X\")\n    return msg\n} \n\nconst currentD = new Date();\nvar startDayStage = new Date();\n// @ts-ignore\nstartDayStage.setHours(...time1.split(':'), 0);\nvar endDayStage = new Date();\n// @ts-ignore\nendDayStage.setHours(...time2.split(':'), 0);\n\nconst isDay = currentD >= startDayStage && currentD < endDayStage\n\nstagesCycle.setStage(stage, isDay)\n\n\n// установка времени следующей смены\nconst nextStageIn = global.get('nextStageIn', 'file')\nif (nextStageIn) {\n    if (new Date(nextStageIn) <= new Date()) {\n        global.set('stageProduction', {}, 'file')\n        global.set('nextStageIn', undefined, 'file')\n        stagesCycle.setStage(\"X\")\n    }\n} else global.set('nextStageIn', stagesCycle.getStageEndTime(), 'file')\n\nreturn msg",
         "outputs": 1,
         "noerr": 0,
-        "initialize": "// Добавленный здесь код будет исполняться\n// однократно при развертывании узла.\n\nclass StageCycle {\n    #stages = ['A','B','C','A','D','C','B','D']\n    current = 0\n\n    setStage(stage, isDay){\n       this.current = this.#stages.findIndex((el, idx) => el === stage && idx % 2 !== (+isDay) )\n    }\n    \n    getStage(){\n        return this.#stages[this.current]\n    }\n\n    nextStage() {\n        if (this.current < this.#stages.length - 1)\n        this.current++\n        else this.current = 0\n    }\n}\n\nglobal.set('stages', new StageCycle())",
+        "initialize": "// Добавленный здесь код будет исполняться\n// однократно при развертывании узла.\n\nclass StageCycle {\n    #stages = ['A','B','C','A','D','C','B','D']\n    current = 0\n\n    setStage(stage, isDay){\n        if (stage === \"X\") this.current = -1 \n        else this.current = this.#stages.findIndex((el, idx) => el === stage && idx % 2 !== (+isDay) )\n        this.setGlobal()\n    }\n\n    setGlobal(){\n        const stageTime = global.get('STAGE_TIME', 'file')\n        stageTime[2] = this.getStage()\n        global.set('STAGE_TIME', stageTime, 'file')\n    }\n    \n    getStage(){\n        if (this.current === -1) return \"X\";\n        return this.#stages[this.current]\n    }\n\n    nextStage() {\n        if (this.current === -1) return\n        if (this.current < this.#stages.length - 1)\n        this.current++\n        else this.current = 0\n        this.setGlobal()\n        global.set('nextStageIn', this.getStageEndTime(), 'file')\n    }\n\n    getStageEndTime(){\n    const [startDay, startNight] = global.get('STAGE_TIME', 'file')\n    const currentD = new Date();\n\n    const startStageTime = this.current % 2 === 0 ? startNight : startDay\n\n    // @ts-ignore\n    currentD.setHours(...startStageTime.split(':'), 0)\n\n        if (new Date() >= currentD) currentD.setDate(currentD.getDate() + 1);\n    \n    return currentD.getTime();\n    }\n}\n\nglobal.set('stages', new StageCycle())",
         "finalize": "",
         "libs": [],
         "x": 490,
@@ -280,7 +288,7 @@
         "links": [
             "a2fa98132ae64af3"
         ],
-        "x": 235,
+        "x": 245,
         "y": 480,
         "wires": [
             [
@@ -347,7 +355,7 @@
         "authType": "",
         "senderr": false,
         "headers": [],
-        "x": 1220,
+        "x": 1240,
         "y": 440,
         "wires": [
             []
@@ -379,11 +387,24 @@
         ]
     },
     {
+        "id": "c4b7301bcd14a36f",
+        "type": "link out",
+        "z": "d8f388f98592d062",
+        "name": "link out 5",
+        "mode": "link",
+        "links": [
+            "15dfe187e0651e45"
+        ],
+        "x": 625,
+        "y": 340,
+        "wires": []
+    },
+    {
         "id": "5c7d0c636d0abba8",
         "type": "function",
         "z": "6e52c1301b78909b",
         "name": "Поменять местами байты",
-        "func": "const values = global.get('values')\n\nconst { modbusRequest: { unitid } } = msg\n\nconst buf = msg.payload.buffer.reverse()\n\nfor (let i = 0; i < buf.length; i=i+2) {\n    [buf[i], buf[i + 1]] = [buf[i+1], buf[i]];\n}\n\nconst newValue = buf.readInt32BE(0)\n\nif (values.hasOwnProperty(unitid)) \n    values[unitid].value = buf.readInt32BE(0)\nelse\nvalues[unitid] = {\n        value: newValue,\n    }",
+        "func": "const values = global.get('values')\nconst stageProd = global.get('stageProduction', 'file')\n\nconst { modbusRequest: { unitid } } = msg\n\nconst buf = msg.payload.buffer.reverse()\n\nfor (let i = 0; i < buf.length; i=i+2) {\n    [buf[i], buf[i + 1]] = [buf[i+1], buf[i]];\n}\n\nconst newValue = buf.readInt32BE(0)\n\nif (values.hasOwnProperty(unitid)) \n    values[unitid].value = buf.readInt32BE(0)\nelse\nvalues[unitid] = {\n        value: newValue,\n    }\n\nif (!(unitid in stageProd)) {\n    stageProd[unitid] = newValue\n}",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
@@ -405,7 +426,7 @@
                 "name": "Counter",
                 "unitid": "1",
                 "fc": "FC4",
-                "address": "1001",
+                "address": "1003",
                 "quantity": "2"
             }
         ],
@@ -424,10 +445,11 @@
         "x": 560,
         "y": 300,
         "wires": [
-            [],
             [
-                "5c7d0c636d0abba8",
-                "8ccaebc5b66802d0"
+                "7ae2a0fe2e84abcf"
+            ],
+            [
+                "5c7d0c636d0abba8"
             ]
         ]
     },
@@ -465,7 +487,7 @@
         "type": "function",
         "z": "6e52c1301b78909b",
         "name": "function 1",
-        "func": "const devices = global.get('devices') || []\n\nconst skipedDevs = flow.get('skipedDevs')\n\n\nconst requestedDevs = devices.filter(({ IsRequested, ModbusID }) => IsRequested && !skipedDevs.has(ModbusID))\n\nmsg.sequences = requestedDevs.map(el=>({\n    name: el.Name,\n    fc: 4,\n    address: el.ValueRegAdr,\n    unitid: el.ModbusID,\n    quantity: 2,    \n}))\n\nreturn msg;",
+        "func": "const devices = global.get('devices') || []\n\nconst skipedDevs = global.get('skipedDevs')\n\n\nconst requestedDevs = devices.filter(({ IsRequested, ModbusID }) => IsRequested && !skipedDevs.has(ModbusID))\n\nmsg.sequences = requestedDevs.map(el=>({\n    name: el.Name,\n    fc: 4,\n    address: el.ValueRegAdr,\n    unitid: el.ModbusID,\n    quantity: 2,    \n}))\n\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
@@ -562,7 +584,7 @@
         "type": "function",
         "z": "6e52c1301b78909b",
         "name": "function 2",
-        "func": "const errCtr = flow.get('errorsCounter')\n\nconst errId = msg.payload.unitid\n\nconst now = Date.now()\n\n\nif (errCtr[errId] && now - errCtr[errId].lastTime < global.get('ERROR_TIME', 'file')){\n    errCtr[errId].counter++\n    errCtr[errId].lastTime = Date.now()\n} else errCtr[errId] = { counter: 1, lastTime: now }\n\n\nif (errCtr[errId].counter >= global.get('ATTEMPTS', 'file')) {\n    const skipedDevs = flow.get('skipedDevs')\n    skipedDevs.add(errId)\n    delete errCtr[errId]\n}",
+        "func": "const errCtr = flow.get('errorsCounter')\n\nconst errId = msg.payload.unitid\n\nconst now = Date.now()\n\n\nif (errCtr[errId] && now - errCtr[errId].lastTime < global.get('ERROR_TIME', 'file')){\n    errCtr[errId].counter++\n    errCtr[errId].lastTime = Date.now()\n} else errCtr[errId] = { counter: 1, lastTime: now }\n\n\nif (errCtr[errId].counter >= global.get('ATTEMPTS', 'file')) {\n    const skipedDevs = global.get('skipedDevs')\n    skipedDevs.add(errId)\n    delete errCtr[errId]\n}",
         "outputs": 0,
         "noerr": 0,
         "initialize": "",
@@ -577,7 +599,7 @@
         "type": "function",
         "z": "6e52c1301b78909b",
         "name": "Инициализация контекста",
-        "func": "flow.set('errorsCounter', {})\nflow.set('skipedDevs', new Set())\nglobal.set('values', {})",
+        "func": "flow.set('errorsCounter', {})\nglobal.set('skipedDevs', new Set())\nglobal.set('values', {})",
         "outputs": 0,
         "noerr": 0,
         "initialize": "",
@@ -608,8 +630,8 @@
         "topic": "",
         "payload": "",
         "payloadType": "date",
-        "x": 190,
-        "y": 960,
+        "x": 170,
+        "y": 780,
         "wires": [
             [
                 "71976d13f1ada451"
@@ -621,14 +643,14 @@
         "type": "function",
         "z": "6e52c1301b78909b",
         "name": "function 3",
-        "func": "const devices = global.get('devices') || []\nconst skipedDevs = flow.get('skipedDevs')\nconst values = global.get('values')\n\nconst package = []\n\n\ndevices.forEach(( el )=>{\n\n    const id = el.ModbusID\n    const title = el.Name\n    const screen = el.Screen\n    let value = null\n    let performance = null\n    if (id in values){\n        value = values[id]?.value\n        performance = values[id]?.performance\n    }\n\n    if (!screen) return\n\n    let status = 'ok'\n\n    if (!el.IsRequested) status = 'disabled'\n    else if (skipedDevs.has(id)) status = 'error'\n\n    package.push({ id, title, screen, status, value, performance})   \n\n});\n\nmsg.payload = package\n\nif (package.length) return msg;\n",
+        "func": "const devices = global.get('devices') || []\nconst skipedDevs = global.get('skipedDevs')\nconst values = global.get('values')\nconst stageProd = global.get('stageProduction', 'file') || {}\n\nconst package = []\n\n\ndevices.forEach(( el )=>{\n\n    const id = el.ModbusID\n    const title = el.Name\n    const screen = el.Screen\n    const plan = el.StagePlan\n    let value = null\n    let performance = null\n    let production = null\n\n    if (id in values){\n        value = values[id]?.value\n        performance = values[id]?.performance\n\n        if (id in stageProd) {\n            const onStageStart = stageProd[id]\n            production = value >= onStageStart ? value - onStageStart : value + 999999 - onStageStart\n        }\n    }\n\n    if (!screen) return\n\n    let status = 'ok'\n\n    if (!el.IsRequested) status = 'disabled'\n    else if (skipedDevs.has(id)) status = 'error'\n\n    package.push({ id, title, screen, status, value, plan, production, performance})   \n\n});\n\nmsg.payload = package\n\nif (package.length) return msg;\n",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 500,
-        "y": 960,
+        "x": 480,
+        "y": 780,
         "wires": [
             [
                 "f1a1f104ea0bff18",
@@ -659,8 +681,8 @@
         "z": "6e52c1301b78909b",
         "name": "Переодическая отправка значений в websocket",
         "info": "",
-        "x": 260,
-        "y": 920,
+        "x": 240,
+        "y": 740,
         "wires": []
     },
     {
@@ -728,7 +750,7 @@
         "type": "function",
         "z": "6e52c1301b78909b",
         "name": "Попытка опроса отключённых",
-        "func": "const devices = global.get('devices') || []\n\nconst skipedDevs = flow.get('skipedDevs')\n\n\nmsg.sequences = Array.from(skipedDevs).reduce((acc, el)=>{\n    const dev = devices.find(dev => dev.ModbusID == el)\n\n    if (dev === undefined || !dev.IsRequested) {\n        skipedDevs.delete(el)\n        return acc\n    }\n\n    if (dev.IsRequested) return [...acc, {\n        name: dev.Name,\n        fc: 4,\n        address: dev.ValueRegAdr,\n        unitid: dev.ModbusID,\n        quantity: 2,\n    }]\n\n},[])\n\nreturn msg;",
+        "func": "const devices = global.get('devices') || []\n\nconst skipedDevs = global.get('skipedDevs')\n\n\nmsg.sequences = Array.from(skipedDevs).reduce((acc, el)=>{\n    const dev = devices.find(dev => dev.ModbusID == el)\n\n    if (dev === undefined || !dev.IsRequested) {\n        skipedDevs.delete(el)\n        return acc\n    }\n\n    if (dev.IsRequested) return [...acc, {\n        name: dev.Name,\n        fc: 4,\n        address: dev.ValueRegAdr,\n        unitid: dev.ModbusID,\n        quantity: 2,\n    }]\n\n},[])\n\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
@@ -747,13 +769,13 @@
         "type": "function",
         "z": "6e52c1301b78909b",
         "name": "Исключить из пропущенных",
-        "func": "flow.get('skipedDevs').delete(+msg.unitId)",
+        "func": "global.get('skipedDevs').delete(+msg.unitId)",
         "outputs": 0,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1020,
+        "x": 1040,
         "y": 460,
         "wires": []
     },
@@ -765,7 +787,7 @@
         "server": "f8eb90804d4934dd",
         "client": "",
         "x": 910,
-        "y": 960,
+        "y": 780,
         "wires": []
     },
     {
@@ -781,8 +803,8 @@
         "targetType": "msg",
         "statusVal": "",
         "statusType": "auto",
-        "x": 740,
-        "y": 1040,
+        "x": 720,
+        "y": 860,
         "wires": []
     },
     {
@@ -807,7 +829,7 @@
         "payload": "",
         "payloadType": "date",
         "x": 170,
-        "y": 660,
+        "y": 600,
         "wires": [
             [
                 "92746cdeb1b34e60"
@@ -821,7 +843,7 @@
         "name": "Вычисление производиетльности",
         "info": "",
         "x": 180,
-        "y": 620,
+        "y": 560,
         "wires": []
     },
     {
@@ -836,24 +858,23 @@
         "finalize": "",
         "libs": [],
         "x": 560,
-        "y": 660,
+        "y": 600,
         "wires": []
     },
     {
-        "id": "8ccaebc5b66802d0",
+        "id": "7ae2a0fe2e84abcf",
         "type": "debug",
         "z": "6e52c1301b78909b",
         "name": "debug 2",
-        "active": true,
+        "active": false,
         "tosidebar": true,
         "console": false,
         "tostatus": false,
-        "complete": "true",
-        "targetType": "full",
+        "complete": "false",
         "statusVal": "",
         "statusType": "auto",
-        "x": 820,
-        "y": 240,
+        "x": 840,
+        "y": 260,
         "wires": []
     },
     {
@@ -865,8 +886,8 @@
         "method": "get",
         "upload": false,
         "swaggerDoc": "",
-        "x": 100,
-        "y": 180,
+        "x": 140,
+        "y": 120,
         "wires": [
             [
                 "78ec0b97e374799a"
@@ -874,24 +895,13 @@
         ]
     },
     {
-        "id": "266c286f.d993d8",
-        "type": "http response",
-        "z": "f8267d55bb8665c3",
-        "name": "",
-        "statusCode": "200",
-        "headers": {},
-        "x": 1200,
-        "y": 180,
-        "wires": []
-    },
-    {
         "id": "bcf0258362e4a423",
         "type": "mysql",
         "z": "f8267d55bb8665c3",
         "mydb": "608ff9c050d10945",
         "name": "",
-        "x": 720,
-        "y": 180,
+        "x": 760,
+        "y": 120,
         "wires": [
             [
                 "6b4dcc60885175ea"
@@ -909,8 +919,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 950,
-        "y": 180,
+        "x": 990,
+        "y": 120,
         "wires": [
             [
                 "266c286f.d993d8"
@@ -942,8 +952,8 @@
         "checkall": "true",
         "repair": false,
         "outputs": 3,
-        "x": 310,
-        "y": 180,
+        "x": 350,
+        "y": 120,
         "wires": [
             [
                 "c44517cb4f2c3564"
@@ -975,28 +985,11 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 520,
-        "y": 180,
-        "wires": [
-            [
-                "bcf0258362e4a423"
-            ]
-        ]
-    },
-    {
-        "id": "60dd932672c09fa1",
-        "type": "http in",
-        "z": "f8267d55bb8665c3",
-        "name": "",
-        "url": "*",
-        "method": "get",
-        "upload": false,
-        "swaggerDoc": "",
-        "x": 70,
+        "x": 560,
         "y": 120,
         "wires": [
             [
-                "d06bee6a1422dc9e"
+                "bcf0258362e4a423"
             ]
         ]
     },
@@ -1007,8 +1000,8 @@
         "name": "",
         "statusCode": "404",
         "headers": {},
-        "x": 460,
-        "y": 220,
+        "x": 500,
+        "y": 160,
         "wires": []
     },
     {
@@ -1020,8 +1013,8 @@
         "method": "post",
         "upload": false,
         "swaggerDoc": "",
-        "x": 110,
-        "y": 340,
+        "x": 150,
+        "y": 280,
         "wires": [
             [
                 "87122c7414d8fa7a"
@@ -1034,8 +1027,8 @@
         "z": "f8267d55bb8665c3",
         "mydb": "608ff9c050d10945",
         "name": "",
-        "x": 680,
-        "y": 340,
+        "x": 720,
+        "y": 280,
         "wires": [
             [
                 "ec8f52e7e0ea5fb6"
@@ -1047,14 +1040,14 @@
         "type": "function",
         "z": "f8267d55bb8665c3",
         "name": "Проверка",
-        "func": "const newDevice = msg.req.body\n\nmsg.payload = newDevice\n\nmsg.topic = `INSERT INTO ModbusCounters (ModbusID, Name, IsRequested, ValueRegAdr, ResetRegAdr, Screen)\nVALUES(:ModbusID, :Name, CONV(:IsRequested, 2, 10) + 0, :ValueRegAdr, :ResetRegAdr, :Screen);`\n\n\nreturn msg;",
+        "func": "const newDevice = msg.req.body\n\nmsg.payload = newDevice\n\nmsg.topic = `INSERT INTO ModbusCounters (ModbusID, Name, IsRequested, ValueRegAdr, ResetRegAdr, Screen, StagePlan)\nVALUES(:ModbusID, :Name, CONV(:IsRequested, 2, 10) + 0, :ValueRegAdr, :ResetRegAdr, :Screen, :StagePlan);`\n\n\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 500,
-        "y": 340,
+        "x": 540,
+        "y": 280,
         "wires": [
             [
                 "b52cfd3ed1fda7d7"
@@ -1068,8 +1061,8 @@
         "name": "",
         "statusCode": "",
         "headers": {},
-        "x": 1170,
-        "y": 340,
+        "x": 1230,
+        "y": 280,
         "wires": []
     },
     {
@@ -1082,8 +1075,8 @@
             "bcf0258362e4a423"
         ],
         "uncaught": false,
-        "x": 680,
-        "y": 260,
+        "x": 720,
+        "y": 200,
         "wires": [
             [
                 "90f55393f1d0d837"
@@ -1116,8 +1109,8 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 920,
-        "y": 260,
+        "x": 960,
+        "y": 200,
         "wires": [
             [
                 "9bd0282ad6e263bd"
@@ -1150,25 +1143,14 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 900,
-        "y": 340,
+        "x": 940,
+        "y": 280,
         "wires": [
             [
                 "9bd0282ad6e263bd",
                 "3b36fa04cce40f0c"
             ]
         ]
-    },
-    {
-        "id": "d06bee6a1422dc9e",
-        "type": "http response",
-        "z": "f8267d55bb8665c3",
-        "name": "",
-        "statusCode": "404",
-        "headers": {},
-        "x": 300,
-        "y": 120,
-        "wires": []
     },
     {
         "id": "3b36fa04cce40f0c",
@@ -1179,8 +1161,8 @@
         "links": [
             "231fb27999873a06"
         ],
-        "x": 1155,
-        "y": 420,
+        "x": 1195,
+        "y": 360,
         "wires": []
     },
     {
@@ -1192,8 +1174,8 @@
         "method": "delete",
         "upload": false,
         "swaggerDoc": "",
-        "x": 120,
-        "y": 500,
+        "x": 160,
+        "y": 440,
         "wires": [
             [
                 "81cb7dac5b5a9ffd"
@@ -1206,8 +1188,8 @@
         "z": "f8267d55bb8665c3",
         "mydb": "608ff9c050d10945",
         "name": "",
-        "x": 700,
-        "y": 500,
+        "x": 740,
+        "y": 440,
         "wires": [
             [
                 "310deaa39557bf34"
@@ -1221,8 +1203,8 @@
         "name": "",
         "statusCode": "",
         "headers": {},
-        "x": 1190,
-        "y": 500,
+        "x": 1230,
+        "y": 440,
         "wires": []
     },
     {
@@ -1234,8 +1216,8 @@
             "b043d5e44e6b72db"
         ],
         "uncaught": false,
-        "x": 700,
-        "y": 560,
+        "x": 740,
+        "y": 500,
         "wires": [
             [
                 "5d611621b61a9cb7"
@@ -1268,8 +1250,8 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 920,
-        "y": 560,
+        "x": 960,
+        "y": 500,
         "wires": [
             [
                 "7bebb1b21f450111"
@@ -1295,8 +1277,8 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 940,
-        "y": 500,
+        "x": 980,
+        "y": 440,
         "wires": [
             [
                 "7bebb1b21f450111",
@@ -1315,8 +1297,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 320,
-        "y": 500,
+        "x": 360,
+        "y": 440,
         "wires": [
             [
                 "b043d5e44e6b72db"
@@ -1332,8 +1314,8 @@
         "method": "put",
         "upload": false,
         "swaggerDoc": "",
-        "x": 110,
-        "y": 660,
+        "x": 150,
+        "y": 600,
         "wires": [
             [
                 "74af5832dac025a4"
@@ -1346,8 +1328,8 @@
         "z": "f8267d55bb8665c3",
         "mydb": "608ff9c050d10945",
         "name": "",
-        "x": 700,
-        "y": 660,
+        "x": 740,
+        "y": 600,
         "wires": [
             [
                 "9d86644e1c7da117"
@@ -1361,8 +1343,8 @@
         "name": "",
         "statusCode": "",
         "headers": {},
-        "x": 1190,
-        "y": 660,
+        "x": 1230,
+        "y": 600,
         "wires": []
     },
     {
@@ -1374,8 +1356,8 @@
             "b43dd66cf14e1b5c"
         ],
         "uncaught": false,
-        "x": 700,
-        "y": 720,
+        "x": 740,
+        "y": 660,
         "wires": [
             [
                 "7da93835884595ae"
@@ -1408,8 +1390,8 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 920,
-        "y": 720,
+        "x": 960,
+        "y": 660,
         "wires": [
             [
                 "6281093da9b619cb"
@@ -1421,17 +1403,18 @@
         "type": "function",
         "z": "f8267d55bb8665c3",
         "name": "Проверка",
-        "func": "const newDevice = msg.req.body\n\nconst oldId = msg.req.params.id\n\n\nif (!global.get('devices').find(el => el.ModbusID == oldId)) return [undefined, msg]\n\nconst newParams = []\n\nfor (let prop in newDevice) {\n\n    if (prop === 'IsRequested') newParams.push(`${prop} = CONV(${newDevice[prop]}, 2, 10) + 0`)\n    else newParams.push(`${prop} = '${newDevice[prop]}'`)\n}\n\nmsg.topic = `UPDATE ModbusCounters SET ${newParams.join(\", \")} WHERE ModbusID = ${oldId}`\n\nreturn msg;",
+        "func": "const newDevice = msg.req.body\n\nconst oldId = msg.req.params.id\n\n\nif (!global.get('devices').find(el => el.ModbusID == oldId)) return [undefined, msg]\n\nconst newParams = []\n\nfor (let prop in newDevice) {\n    if (prop === 'IsRequested') newParams.push(`${prop} = CONV(${newDevice[prop]}, 2, 10) + 0`)\n    else if (newDevice[prop] === null) newParams.push(`${prop} = null`)\n    else newParams.push(`${prop} = '${newDevice[prop]}'`)\n}\n\nmsg.topic = `UPDATE ModbusCounters SET ${newParams.join(\", \")} WHERE ModbusID = ${oldId}`\n\nreturn msg;",
         "outputs": 2,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 320,
-        "y": 660,
+        "x": 360,
+        "y": 600,
         "wires": [
             [
-                "b43dd66cf14e1b5c"
+                "b43dd66cf14e1b5c",
+                "26bbfd703ad12e58"
             ],
             [
                 "87122c7414d8fa7a"
@@ -1464,8 +1447,8 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 920,
-        "y": 660,
+        "x": 960,
+        "y": 600,
         "wires": [
             [
                 "6281093da9b619cb",
@@ -1484,8 +1467,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 800,
-        "y": 120,
+        "x": 840,
+        "y": 60,
         "wires": [
             [
                 "266c286f.d993d8"
@@ -1501,8 +1484,8 @@
         "method": "put",
         "upload": false,
         "swaggerDoc": "",
-        "x": 100,
-        "y": 840,
+        "x": 140,
+        "y": 780,
         "wires": [
             [
                 "c0cd52030be91ae7"
@@ -1516,8 +1499,8 @@
         "name": "",
         "statusCode": "",
         "headers": {},
-        "x": 1190,
-        "y": 840,
+        "x": 1230,
+        "y": 780,
         "wires": []
     },
     {
@@ -1526,11 +1509,11 @@
         "z": "f8267d55bb8665c3",
         "name": "",
         "scope": [
-            "b4fb70fbe6dc33de"
+            "c0cd52030be91ae7"
         ],
         "uncaught": false,
-        "x": 700,
-        "y": 900,
+        "x": 740,
+        "y": 840,
         "wires": [
             [
                 "7067cd22fb18ebe1"
@@ -1563,11 +1546,12 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 900,
-        "y": 900,
+        "x": 940,
+        "y": 840,
         "wires": [
             [
-                "4223c9348cacbd7a"
+                "4223c9348cacbd7a",
+                "395fd8f5c69c18fa"
             ]
         ]
     },
@@ -1576,14 +1560,14 @@
         "type": "function",
         "z": "f8267d55bb8665c3",
         "name": "Проверка",
-        "func": "const upSettings = Object.entries(msg.payload)\nconst oldSettings = global.keys('file')\n\nconst updated = {}\n\nupSettings.forEach(([key, newValue]) => {\n   if (oldSettings.includes(key) && global.get(key, 'file') !== newValue) {\n       global.set(key, newValue, 'file')\n       updated[key] = newValue\n   }\n})\n\n\nmsg.payload = updated\n\nmsg.headers = {\n    'content-type': 'application/json'\n}\n\n\nreturn msg;",
+        "func": "const upSettings = Object.entries(msg.payload)\nconst oldSettings = global.keys('file')\n\nconst updated = {}\n\nupSettings.forEach(([key, newValue]) => {\n   if (oldSettings.includes(key) && global.get(key, 'file') !== newValue) {\n       global.set(key, newValue, 'file')\n       updated[key] = newValue\n   } else {\n       throw new Error(`Такого свойства несуществует: ${key}`)\n       }\n})\n\n\nmsg.payload = updated\n\nmsg.headers = {\n    'content-type': 'application/json'\n}\n\n\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 420,
-        "y": 840,
+        "x": 460,
+        "y": 780,
         "wires": [
             [
                 "2273afe464be4bf1",
@@ -1610,8 +1594,8 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 900,
-        "y": 840,
+        "x": 940,
+        "y": 780,
         "wires": [
             [
                 "4223c9348cacbd7a"
@@ -1640,8 +1624,8 @@
         "checkall": "true",
         "repair": false,
         "outputs": 2,
-        "x": 610,
-        "y": 960,
+        "x": 650,
+        "y": 900,
         "wires": [
             [
                 "22e0cbeb7a386cfd"
@@ -1660,8 +1644,8 @@
         "links": [
             "61aced3fbb77aa02"
         ],
-        "x": 855,
-        "y": 940,
+        "x": 895,
+        "y": 880,
         "wires": []
     },
     {
@@ -1673,8 +1657,100 @@
         "links": [
             "54b5bf7510091755"
         ],
-        "x": 855,
-        "y": 980,
+        "x": 895,
+        "y": 920,
+        "wires": []
+    },
+    {
+        "id": "26bbfd703ad12e58",
+        "type": "debug",
+        "z": "f8267d55bb8665c3",
+        "name": "debug 4",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 540,
+        "y": 640,
+        "wires": []
+    },
+    {
+        "id": "094947a94e5326c9",
+        "type": "http in",
+        "z": "f8267d55bb8665c3",
+        "name": "",
+        "url": "/api/password",
+        "method": "post",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 150,
+        "y": 1000,
+        "wires": [
+            [
+                "dbce9f3f09957a4d"
+            ]
+        ]
+    },
+    {
+        "id": "dbce9f3f09957a4d",
+        "type": "function",
+        "z": "f8267d55bb8665c3",
+        "name": "Проверка",
+        "func": "const rightPassword = global.get('settingsPagePassword', 'file') \nconst reqBody = msg.req.body\n\nif ('password' in reqBody)\nnode.warn(reqBody.password);\n\nmsg.statusCode = (reqBody.password === rightPassword) ? 200 : 403\nreturn msg",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 360,
+        "y": 1000,
+        "wires": [
+            [
+                "43564ed009568e3b"
+            ]
+        ]
+    },
+    {
+        "id": "266c286f.d993d8",
+        "type": "http response",
+        "z": "f8267d55bb8665c3",
+        "name": "",
+        "statusCode": "200",
+        "headers": {},
+        "x": 1240,
+        "y": 120,
+        "wires": []
+    },
+    {
+        "id": "43564ed009568e3b",
+        "type": "http response",
+        "z": "f8267d55bb8665c3",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 530,
+        "y": 1000,
+        "wires": []
+    },
+    {
+        "id": "395fd8f5c69c18fa",
+        "type": "debug",
+        "z": "f8267d55bb8665c3",
+        "name": "debug 6",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1140,
+        "y": 880,
         "wires": []
     },
     {
@@ -1708,7 +1784,7 @@
         "z": "dc35f1f13fade75e",
         "mydb": "608ff9c050d10945",
         "name": "",
-        "x": 660,
+        "x": 680,
         "y": 300,
         "wires": [
             []
@@ -1723,7 +1799,7 @@
         "fieldType": "msg",
         "format": "handlebars",
         "syntax": "mustache",
-        "template": "SET NAMES utf8mb4;\n\nCREATE TABLE IF NOT EXISTS `ModbusCounters` (\n  `ModbusID` tinyint unsigned NOT NULL COMMENT 'Id модбас устройства',\n  `Name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT 'Отображаемое имя',\n  `IsRequested` bit(1) NOT NULL COMMENT 'Опрашивается или нет',\n  `ValueRegAdr` smallint unsigned NOT NULL DEFAULT '1001' COMMENT 'Адрес регистра текущего значения',\n  `ResetRegAdr` smallint unsigned NOT NULL DEFAULT '1' COMMENT 'Адрес Coil сброса',\n  `Screen` tinyint unsigned NOT NULL COMMENT 'Экран для отображения',\n  PRIMARY KEY (`ModbusID`)\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;",
+        "template": "SET NAMES utf8mb4;\n\nCREATE TABLE IF NOT EXISTS `ModbusCounters` (\n  `ModbusID` tinyint unsigned NOT NULL COMMENT 'Id модбас устройства',\n  `Name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT 'Отображаемое имя',\n  `IsRequested` bit(1) NOT NULL COMMENT 'Опрашивается или нет',\n  `ValueRegAdr` smallint unsigned NOT NULL DEFAULT '1003' COMMENT 'Адрес регистра текущего значения',\n  `ResetRegAdr` smallint unsigned NOT NULL DEFAULT '1' COMMENT 'Адрес Coil сброса',\n  `StagePlan` mediumint unsigned NULL COMMENT 'План на смену',\n  `Screen` tinyint unsigned NOT NULL COMMENT 'Экран для отображения',\n  PRIMARY KEY (`ModbusID`)\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;\n\nCREATE TABLE IF NOT EXISTS `ArchiveData` (\n  `id` bigint unsigned NOT NULL AUTO_INCREMENT,\n  `dateTime` datetime NOT NULL,\n  `modbusId` tinyint unsigned NOT NULL,\n  `name` varchar(50) NOT NULL,\n  `stage` char(1) DEFAULT '',\n  `absValue` mediumint unsigned NOT NULL,\n  `plan` mediumint unsigned DEFAULT NULL,\n  `value` mediumint unsigned DEFAULT NULL,\n  PRIMARY KEY (`id`)\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;",
         "output": "str",
         "x": 460,
         "y": 300,
@@ -1838,6 +1914,189 @@
         ]
     },
     {
+        "id": "15dfe187e0651e45",
+        "type": "link in",
+        "z": "dc35f1f13fade75e",
+        "name": "link in 2",
+        "links": [
+            "c4b7301bcd14a36f"
+        ],
+        "x": 275,
+        "y": 380,
+        "wires": [
+            [
+                "08600ded3b72ae71"
+            ]
+        ]
+    },
+    {
+        "id": "684e0fb75ab82082",
+        "type": "cronplus",
+        "z": "df21a5b106a947a5",
+        "name": "",
+        "outputField": "payload",
+        "timeZone": "",
+        "storeName": "",
+        "commandResponseMsgOutput": "output1",
+        "defaultLocation": "",
+        "defaultLocationType": "default",
+        "outputs": 1,
+        "options": [
+            {
+                "name": "schedule1",
+                "topic": "timestamp",
+                "payloadType": "date",
+                "payload": "",
+                "expressionType": "cron",
+                "expression": "0 */10 * * * *",
+                "location": "",
+                "offset": "0",
+                "solarType": "all",
+                "solarEvents": "sunrise,sunset"
+            }
+        ],
+        "x": 140,
+        "y": 120,
+        "wires": [
+            [
+                "27d187a9cf0609d3"
+            ]
+        ]
+    },
+    {
+        "id": "ad83da4e41fbe487",
+        "type": "function",
+        "z": "df21a5b106a947a5",
+        "name": "Сделать запись",
+        "func": "const datetime = msg.payload\nconst devices = global.get('devices') || []\nconst skipedDevs = global.get('skipedDevs')\nconst values = global.get('values')\nconst stageProd = global.get('stageProduction', 'file') || {}\n\n\nconst stage = global.get('stages').getStage()\n\nconst query = devices\n    .filter(({ IsRequested, ModbusID }) => IsRequested && ModbusID in values)\n    .reduce((acc, el) => {\n        const id = el.ModbusID\n        const name = el.Name\n        const absValue = values[id]?.value || 0\n        let plan = el.StagePlan || null\n        let value = null\n\n        if (id in stageProd) {\n            const prod = stageProd[id]\n            value = absValue >= prod ? absValue - prod : absValue + 999999 - prod\n        }\n\n        acc.push(`INSERT INTO ArchiveData (datetime, modbusId, name, stage, absValue, plan, value) VALUES('${datetime}',${id},'${name}','${stage}',${absValue},${plan},${value});`)\n        return acc\n        },[]);\n\nif (query.length === 0) return\n\nmsg.topic = query.join('\\r\\n')\nreturn msg;\n",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 940,
+        "y": 120,
+        "wires": [
+            [
+                "2dc1427a5f845305",
+                "b90ca50d9c9f8717"
+            ]
+        ]
+    },
+    {
+        "id": "873dda3a08df0990",
+        "type": "moment",
+        "z": "df21a5b106a947a5",
+        "name": "",
+        "topic": "",
+        "input": "payload",
+        "inputType": "msg",
+        "inTz": "Asia/Yekaterinburg",
+        "adjAmount": 0,
+        "adjType": "days",
+        "adjDir": "add",
+        "format": "YYYY-MM-DD HH:mm:ss",
+        "locale": "ru-RU",
+        "output": "payload",
+        "outputType": "msg",
+        "outTz": "Asia/Yekaterinburg",
+        "x": 680,
+        "y": 120,
+        "wires": [
+            [
+                "ad83da4e41fbe487"
+            ]
+        ]
+    },
+    {
+        "id": "b90ca50d9c9f8717",
+        "type": "mysql",
+        "z": "df21a5b106a947a5",
+        "mydb": "608ff9c050d10945",
+        "name": "",
+        "x": 1180,
+        "y": 120,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "2dc1427a5f845305",
+        "type": "debug",
+        "z": "df21a5b106a947a5",
+        "name": "debug 3",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "topic",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1180,
+        "y": 60,
+        "wires": []
+    },
+    {
+        "id": "27d187a9cf0609d3",
+        "type": "change",
+        "z": "df21a5b106a947a5",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "inTz",
+                "pt": "msg",
+                "to": "TZ",
+                "tot": "env"
+            },
+            {
+                "t": "set",
+                "p": "outTz",
+                "pt": "msg",
+                "to": "TZ",
+                "tot": "env"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 380,
+        "y": 120,
+        "wires": [
+            [
+                "873dda3a08df0990"
+            ]
+        ]
+    },
+    {
+        "id": "516b11021417f278",
+        "type": "inject",
+        "z": "df21a5b106a947a5",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 140,
+        "y": 240,
+        "wires": [
+            [
+                "27d187a9cf0609d3"
+            ]
+        ]
+    },
+    {
         "id": "df44bd15fd1035b1",
         "type": "moment",
         "z": "7e68559fb83a6c0a",
@@ -1854,8 +2113,8 @@
         "output": "payload",
         "outputType": "msg",
         "outTz": "Asia/Yekaterinburg",
-        "x": 600,
-        "y": 620,
+        "x": 640,
+        "y": 500,
         "wires": [
             [
                 "35b45ec84dcfa0b5"
@@ -1870,6 +2129,16 @@
         "props": [
             {
                 "p": "payload"
+            },
+            {
+                "p": "inTz",
+                "v": "TZ",
+                "vt": "env"
+            },
+            {
+                "p": "outTz",
+                "v": "TZ",
+                "vt": "env"
             }
         ],
         "repeat": "10",
@@ -1879,8 +2148,8 @@
         "topic": "",
         "payload": "",
         "payloadType": "date",
-        "x": 290,
-        "y": 620,
+        "x": 330,
+        "y": 500,
         "wires": [
             [
                 "df44bd15fd1035b1"
@@ -1894,8 +2163,8 @@
         "name": "",
         "server": "e0707ccdfb3f12e8",
         "client": "",
-        "x": 1070,
-        "y": 620,
+        "x": 1110,
+        "y": 500,
         "wires": []
     },
     {
@@ -1909,8 +2178,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 840,
-        "y": 620,
+        "x": 880,
+        "y": 500,
         "wires": [
             [
                 "0ffb7b2d93f5ec64"
@@ -1922,15 +2191,19 @@
         "type": "function",
         "z": "7e68559fb83a6c0a",
         "name": "Смена - дальше",
-        "func": "const [time1, time2, stage] = global.get('STAGE_TIME', 'file')\nconst stages = global.get('stages')\n\nstages.nextStage()\n\nglobal.set('STAGE_TIME', [time1, time2, stages.getStage() ], 'file')",
-        "outputs": 0,
+        "func": "const stages = global.get('stages')\nstages.nextStage()\n\nreturn msg",
+        "outputs": 1,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 730,
+        "x": 650,
         "y": 360,
-        "wires": []
+        "wires": [
+            [
+                "198c8cce5dcefc2f"
+            ]
+        ]
     },
     {
         "id": "2f1560f4455dfc50",
@@ -1939,7 +2212,7 @@
         "name": "Таймер дневной смены",
         "props": [],
         "repeat": "",
-        "crontab": "13 14 * * *",
+        "crontab": "00 09 * * *",
         "once": false,
         "onceDelay": 0.1,
         "topic": "",
@@ -1968,6 +2241,23 @@
             [
                 "e20e5f0e3c3c026b"
             ]
+        ]
+    },
+    {
+        "id": "198c8cce5dcefc2f",
+        "type": "function",
+        "z": "7e68559fb83a6c0a",
+        "name": "Запомнить значения",
+        "func": "const stageProd = {}\nconst devices = global.get('devices') || []\nconst skipedDevs = global.get('skipedDevs')\nconst values = global.get('values')\n\n\ndevices.filter(({ IsRequested }) => IsRequested).forEach((el) => {\n    const id = el.ModbusID\n    if (id in values)    \n    stageProd[id]=values[id].value\n});\n\nglobal.set('stageProduction', stageProd, 'file')\n\n//node.warn(stageProd)",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 920,
+        "y": 360,
+        "wires": [
+            []
         ]
     }
 ]

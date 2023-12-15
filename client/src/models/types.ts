@@ -7,6 +7,8 @@ export type DeviceData = {
   status: DeviceStatus
   value: number | null
   performance: number | null
+  plan: number | null
+  production: number | null
 }
 
 export type DeviceConfig = {
@@ -15,10 +17,11 @@ export type DeviceConfig = {
   IsRequested: boolean
   ValueRegAdr: number
   ResetRegAdr: number
+  StagePlan: number | null
   Screen: number
 }
 
-export const StageLetters = ['A', 'B', 'C', 'D'] as const
+export const StageLetters = ['A', 'B', 'C', 'D', 'X'] as const
 export type StageLettersType = (typeof StageLetters)[number]
 
 export type Configs = {

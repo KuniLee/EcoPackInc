@@ -19,7 +19,7 @@ const DeviceForm: FC<DeviceFormProp> = ({ defaultValue, onDelete, onSubmit: onSu
     handleSubmit,
   } = useForm<DeviceConfig>({
     values: defaultValue,
-    defaultValues: { ResetRegAdr: 1, ValueRegAdr: 1001 },
+    defaultValues: { ResetRegAdr: 1, ValueRegAdr: 1003 },
   })
 
   const onSubmit = handleSubmit(onSubmitFunc)
@@ -44,14 +44,15 @@ const DeviceForm: FC<DeviceFormProp> = ({ defaultValue, onDelete, onSubmit: onSu
         <TEInput
           className="mt-6"
           type="text"
+          maxLength={40}
           id={'name' + id}
           label="Название"
           defaultValue={defaultValue?.Name}
           {...register('Name', {
             required: 'Введите название',
             maxLength: {
-              value: 50,
-              message: 'Не должно превышать 50 символов',
+              value: 40,
+              message: 'Не должно превышать 40 символов',
             },
           })}>
           <small id={'nameError' + id} className="absolute w-full text-danger-700 dark:text-neutral-200">
@@ -69,6 +70,18 @@ const DeviceForm: FC<DeviceFormProp> = ({ defaultValue, onDelete, onSubmit: onSu
           {...register('Screen', { required: 'Введите номер экрана', valueAsNumber: true })}>
           <small id={'screenError' + id} className="absolute w-full text-danger-700 dark:text-neutral-200">
             {errors.Screen?.message}
+          </small>
+        </TEInput>
+        <TEInput
+          className="mt-6"
+          type="number"
+          id={'plan' + id}
+          label="План на смену"
+          max={999999}
+          defaultValue={defaultValue?.StagePlan ?? ''}
+          {...register('StagePlan', { valueAsNumber: true })}>
+          <small id={'planError' + id} className="absolute w-full text-danger-700 dark:text-neutral-200">
+            {errors.StagePlan?.message}
           </small>
         </TEInput>
         <TEInput
