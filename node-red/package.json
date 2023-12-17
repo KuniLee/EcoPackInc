@@ -1,17 +1,17 @@
 {
     "name": "node-red-project",
     "description": "A Node-RED Project",
-    "version": "0.0.1",
+    "version": "0.1.0",
     "private": true,
     "scripts": {
         "start": "node $NODE_OPTIONS node_modules/node-red/red.js $FLOWS",
         "dev": "node-red -u ./"
     },
     "dependencies": {
-        "node-red": "3.0.2",
-        "node-red-contrib-cron-plus": "~2.1.0",
-        "node-red-contrib-modbus": "~5.26.0",
-        "node-red-contrib-moment": "~4.0.0",
-        "node-red-node-mysql": "~1.0.3"
+        "node-red": "3.1.3",
+        "node-red-contrib-cron-plus": "2.1.0",
+        "node-red-contrib-modbus": "5.27.2",
+        "node-red-contrib-moment": "5.0.0",
+        "node-red-node-mysql": "2.0.0"
     }
 }

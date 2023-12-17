@@ -34,7 +34,7 @@ services:
       TZ: ${TZ}
       MYSQL_IP: ${MYSQL_IP_ENV}
     volumes:
-      - ./settings:/data/context/global
+      - settings:/data/context/global
 
   mysql:
     image: mysql:8
