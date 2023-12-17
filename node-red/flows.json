@@ -68,11 +68,11 @@
         "serialConnectionDelay": "100",
         "serialAsciiResponseStartDelimiter": "",
         "unit_id": "",
-        "commandDelay": 1,
-        "clientTimeout": 500,
+        "commandDelay": "5",
+        "clientTimeout": "500",
         "reconnectOnTimeout": true,
-        "reconnectTimeout": 2000,
-        "parallelUnitIdsAllowed": true
+        "reconnectTimeout": "2000",
+        "parallelUnitIdsAllowed": false
     },
     {
         "id": "608ff9c050d10945",
@@ -575,7 +575,8 @@
         "y": 360,
         "wires": [
             [
-                "1d5aad3c74b2c0d4"
+                "1d5aad3c74b2c0d4",
+                "9ea29d141825cf8e"
             ]
         ]
     },
@@ -865,16 +866,34 @@
         "id": "7ae2a0fe2e84abcf",
         "type": "debug",
         "z": "6e52c1301b78909b",
-        "name": "debug 2",
+        "name": "Ответы Modbus",
         "active": false,
         "tosidebar": true,
         "console": false,
         "tostatus": false,
-        "complete": "false",
+        "complete": "payload",
+        "targetType": "msg",
         "statusVal": "",
         "statusType": "auto",
-        "x": 840,
+        "x": 860,
         "y": 260,
+        "wires": []
+    },
+    {
+        "id": "9ea29d141825cf8e",
+        "type": "debug",
+        "z": "6e52c1301b78909b",
+        "name": "Ошибки Modbus",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 870,
+        "y": 400,
         "wires": []
     },
     {
