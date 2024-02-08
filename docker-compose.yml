@@ -1,18 +1,18 @@
 version: '3.3'
 services:
-  watchtower:
-    container_name: watchtower
-    restart: always
-    environment:
-      - TZ=Europe/London
-      - WATCHTOWER_LIFECYCLE_HOOKS=1
-      - WATCHTOWER_CLEANUP=true
-      - WATCHTOWER_NOTIFICATIONS=shoutrrr
-      - WATCHTOWER_NOTIFICATION_URL=telegram://1724826386:AAGeFEhps8_0H1vJLOxa9Yy8i3Fr5XZ30Gk@telegram/?channels=373334037
-    command: --interval 30 nginx node-red swagger-ui
-    volumes:
-      - '/var/run/docker.sock:/var/run/docker.sock'
-    image: containrrr/watchtower
+#  watchtower:
+#    container_name: watchtower
+#    restart: always
+#    environment:
+#      - TZ=Europe/London
+#      - WATCHTOWER_LIFECYCLE_HOOKS=1
+#      - WATCHTOWER_CLEANUP=true
+#      - WATCHTOWER_NOTIFICATIONS=shoutrrr
+#      - WATCHTOWER_NOTIFICATION_URL=telegram://1724826386:AAGeFEhps8_0H1vJLOxa9Yy8i3Fr5XZ30Gk@telegram/?channels=373334037
+#    command: --interval 30 nginx node-red swagger-ui
+#    volumes:
+#      - '/var/run/docker.sock:/var/run/docker.sock'
+#    image: containrrr/watchtower
 
   nginx:
     image: kunilee/nginx:latest
